@@ -34,4 +34,8 @@ var (
 			Foreground(lipgloss.Color("#FFA500")).
 			Bold(true).
 			Padding(1, 0)
+
+	spinnerStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#00FFFF")).
+			Bold(true)
 )

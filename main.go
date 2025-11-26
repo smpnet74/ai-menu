@@ -61,8 +61,8 @@ func initialModel() model {
 	ti.SetValue(currentDir)
 
 	s := spinner.New()
-	s.Spinner = spinner.Dot
-	s.Style = selectedItemStyle
+	s.Spinner = spinner.Points
+	s.Style = spinnerStyle
 
 	return model{
 		state:           cliToolsView,

@@ -12,9 +12,33 @@ func (m model) renderCLITools() string {
 	b.WriteString(title)
 	b.WriteString("\n\n")
 
+	// Add "Select All" option at the top
+	cursor := " "
+	if m.cursor == 0 {
+		cursor = ">"
+	}
+
+	allSelected := len(m.selectedCLI) == len(m.cliTools)
+	checked := "[ ]"
+	checkStyle := uncheckedStyle
+	if allSelected && len(m.cliTools) > 0 {
+		checked = "[✓]"
+		checkStyle = checkedStyle
+	}
+
+	itemStyle := normalItemStyle
+	if m.cursor == 0 {
+		itemStyle = selectedItemStyle
+	}
+
+	line := fmt.Sprintf("%s %s %s", cursor, checkStyle.Render(checked), itemStyle.Render("Select All"))
+	b.WriteString(line)
+	b.WriteString("\n\n")
+
+	// Render actual tools
 	for i, tool := range m.cliTools {
 		cursor := " "
-		if m.cursor == i {
+		if m.cursor == i+1 {
 			cursor = ">"
 		}
 
@@ -26,7 +50,7 @@ func (m model) renderCLITools() string {
 		}
 
 		itemStyle := normalItemStyle
-		if m.cursor == i {
+		if m.cursor == i+1 {
 			itemStyle = selectedItemStyle
 		}
 
@@ -50,9 +74,33 @@ func (m model) renderVSCodeExtensions() string {
 	b.WriteString(title)
 	b.WriteString("\n\n")
 
+	// Add "Select All" option at the top
+	cursor := " "
+	if m.cursor == 0 {
+		cursor = ">"
+	}
+
+	allSelected := len(m.selectedVSCode) == len(m.vscodeExts)
+	checked := "[ ]"
+	checkStyle := uncheckedStyle
+	if allSelected && len(m.vscodeExts) > 0 {
+		checked = "[✓]"
+		checkStyle = checkedStyle
+	}
+
+	itemStyle := normalItemStyle
+	if m.cursor == 0 {
+		itemStyle = selectedItemStyle
+	}
+
+	line := fmt.Sprintf("%s %s %s", cursor, checkStyle.Render(checked), itemStyle.Render("Select All"))
+	b.WriteString(line)
+	b.WriteString("\n\n")
+
+	// Render actual extensions
 	for i, ext := range m.vscodeExts {
 		cursor := " "
-		if m.cursor == i {
+		if m.cursor == i+1 {
 			cursor = ">"
 		}
 
@@ -64,7 +112,7 @@ func (m model) renderVSCodeExtensions() string {
 		}
 
 		itemStyle := normalItemStyle
-		if m.cursor == i {
+		if m.cursor == i+1 {
 			itemStyle = selectedItemStyle
 		}
 
@@ -88,9 +136,33 @@ func (m model) renderSpecialTools() string {
 	b.WriteString(title)
 	b.WriteString("\n\n")
 
+	// Add "Select All" option at the top
+	cursor := " "
+	if m.cursor == 0 {
+		cursor = ">"
+	}
+
+	allSelected := len(m.selectedSpecial) == len(m.specialTools)
+	checked := "[ ]"
+	checkStyle := uncheckedStyle
+	if allSelected && len(m.specialTools) > 0 {
+		checked = "[✓]"
+		checkStyle = checkedStyle
+	}
+
+	itemStyle := normalItemStyle
+	if m.cursor == 0 {
+		itemStyle = selectedItemStyle
+	}
+
+	line := fmt.Sprintf("%s %s %s", cursor, checkStyle.Render(checked), itemStyle.Render("Select All"))
+	b.WriteString(line)
+	b.WriteString("\n\n")
+
+	// Render actual tools
 	for i, tool := range m.specialTools {
 		cursor := " "
-		if m.cursor == i {
+		if m.cursor == i+1 {
 			cursor = ">"
 		}
 
@@ -102,7 +174,7 @@ func (m model) renderSpecialTools() string {
 		}
 
 		itemStyle := normalItemStyle
-		if m.cursor == i {
+		if m.cursor == i+1 {
 			itemStyle = selectedItemStyle
 		}
 

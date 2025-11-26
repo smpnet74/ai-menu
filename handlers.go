@@ -35,11 +35,14 @@ func (m model) handleDown() int {
 	var maxLen int
 	switch m.state {
 	case cliToolsView:
-		maxLen = len(m.cliTools)
+		// +1 for "Select All" option at the top
+		maxLen = len(m.cliTools) + 1
 	case vscodeExtensionsView:
-		maxLen = len(m.vscodeExts)
+		// +1 for "Select All" option at the top
+		maxLen = len(m.vscodeExts) + 1
 	case specialToolsView:
-		maxLen = len(m.specialTools)
+		// +1 for "Select All" option at the top
+		maxLen = len(m.specialTools) + 1
 	default:
 		return m.cursor
 	}
@@ -53,24 +56,57 @@ func (m model) handleDown() int {
 func (m *model) toggleSelection() {
 	switch m.state {
 	case cliToolsView:
-		if m.cursor < len(m.cliTools) {
-			tool := m.cliTools[m.cursor]
+		if m.cursor == 0 {
+			// Toggle Select All
+			if len(m.selectedCLI) == len(m.cliTools) {
+				// All selected, deselect all
+				m.selectedCLI = make(map[string]bool)
+			} else {
+				// Not all selected, select all
+				for _, tool := range m.cliTools {
+					m.selectedCLI[tool] = true
+				}
+			}
+		} else if m.cursor <= len(m.cliTools) {
+			tool := m.cliTools[m.cursor-1]
 			m.selectedCLI[tool] = !m.selectedCLI[tool]
 			if !m.selectedCLI[tool] {
 				delete(m.selectedCLI, tool)
 			}
 		}
 	case vscodeExtensionsView:
-		if m.cursor < len(m.vscodeExts) {
-			ext := m.vscodeExts[m.cursor]
+		if m.cursor == 0 {
+			// Toggle Select All
+			if len(m.selectedVSCode) == len(m.vscodeExts) {
+				// All selected, deselect all
+				m.selectedVSCode = make(map[string]bool)
+			} else {
+				// Not all selected, select all
+				for _, ext := range m.vscodeExts {
+					m.selectedVSCode[ext] = true
+				}
+			}
+		} else if m.cursor <= len(m.vscodeExts) {
+			ext := m.vscodeExts[m.cursor-1]
 			m.selectedVSCode[ext] = !m.selectedVSCode[ext]
 			if !m.selectedVSCode[ext] {
 				delete(m.selectedVSCode, ext)
 			}
 		}
 	case specialToolsView:
-		if m.cursor < len(m.specialTools) {
-			tool := m.specialTools[m.cursor]
+		if m.cursor == 0 {
+			// Toggle Select All
+			if len(m.selectedSpecial) == len(m.specialTools) {
+				// All selected, deselect all
+				m.selectedSpecial = make(map[string]bool)
+			} else {
+				// Not all selected, select all
+				for _, tool := range m.specialTools {
+					m.selectedSpecial[tool] = true
+				}
+			}
+		} else if m.cursor <= len(m.specialTools) {
+			tool := m.specialTools[m.cursor-1]
 			m.selectedSpecial[tool] = !m.selectedSpecial[tool]
 			if !m.selectedSpecial[tool] {
 				delete(m.selectedSpecial, tool)
