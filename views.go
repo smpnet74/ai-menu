@@ -143,7 +143,7 @@ func (m model) renderPathInput() string {
 	b.WriteString(pathPreview)
 	b.WriteString("\n\n")
 
-	infoText := helpStyle.Render("A pixi environment with nodejs 22.* will be created at this location.\nSupports: linux-64, linux-aarch64, osx-64, osx-arm64")
+	infoText := helpStyle.Render("A pixi environment with nodejs 22.* will be created at this location.\nSupports: linux-64, linux-aarch64")
 	b.WriteString(infoText)
 	b.WriteString("\n\n")
 
@@ -271,12 +271,31 @@ func (m model) renderDone() string {
 	b.WriteString("\n")
 
 	// Detailed results
+	cliToolInstalled := false
 	for _, result := range m.installResults {
 		if result.Success {
 			b.WriteString(checkedStyle.Render(fmt.Sprintf("✓ %s", result.Name)))
+			// Check if this is a CLI tool (npm package)
+			if len(m.selectedCLI) > 0 {
+				for cliTool := range m.selectedCLI {
+					if result.Name == cliTool || result.Name == strings.Split(cliTool, " - ")[0] {
+						cliToolInstalled = true
+						break
+					}
+				}
+			}
 		} else {
 			b.WriteString(uncheckedStyle.Render(fmt.Sprintf("✗ %s: %v", result.Name, result.Error)))
 		}
+		b.WriteString("\n")
+	}
+
+	// Show reminder to source .zshrc only if CLI tools were successfully installed
+	if cliToolInstalled {
+		b.WriteString("\n")
+		b.WriteString(summaryStyle.Render("⚠️  Important: To use the CLI tool aliases, run:"))
+		b.WriteString("\n")
+		b.WriteString(selectedItemStyle.Render("  source ~/.zshrc"))
 		b.WriteString("\n")
 	}
 

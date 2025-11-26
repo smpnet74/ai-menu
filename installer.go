@@ -17,6 +17,25 @@ type InstallResult struct {
 
 type ProgressCallback func(message string)
 
+// getAliasName returns the desired shell alias name for a given npm package
+func getAliasName(packageName string) string {
+	// Map specific package names to their desired aliases
+	aliasMap := map[string]string{
+		"@qodo/command":      "qodo",
+		"@google/gemini-cli": "gemini",
+		"@openai/codex":      "codex",
+		"opencode-ai":        "opencode",
+	}
+
+	// Check if we have a specific mapping
+	if alias, exists := aliasMap[packageName]; exists {
+		return alias
+	}
+
+	// Default: use the package name as-is (shouldn't happen with current tools)
+	return packageName
+}
+
 // InstallCLITools installs the selected CLI tools in a new pixi environment
 func InstallCLITools(tools []string, installPath string, progress ProgressCallback) []InstallResult {
 	results := make([]InstallResult, 0, len(tools))
@@ -56,7 +75,7 @@ func InstallCLITools(tools []string, installPath string, progress ProgressCallba
 
 	// Initialize pixi project
 	progress("Initializing pixi project...")
-	cmd := exec.Command("pixi", "init", "--platform", "linux-64", "--platform", "osx-64", "--platform", "osx-arm64")
+	cmd := exec.Command("pixi", "init", "--platform", "linux-64", "--platform", "linux-aarch64")
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
@@ -113,7 +132,63 @@ func InstallCLITools(tools []string, installPath string, progress ProgressCallba
 	}
 
 	progress(fmt.Sprintf("📦 CLI tools installed in pixi environment at: %s", envDir))
+
+	// Add aliases to ~/.zshrc for easy access
+	homeDir, err := os.UserHomeDir()
+	if err == nil {
+		zshrcPath := homeDir + "/.zshrc"
+		progress("Adding aliases to ~/.zshrc...")
+
+		// Read existing .zshrc content
+		existingContent, err := os.ReadFile(zshrcPath)
+		if err != nil && !os.IsNotExist(err) {
+			progress(fmt.Sprintf("⚠️  Could not read ~/.zshrc: %v", err))
+		}
+
+		// Open .zshrc for appending
+		f, err := os.OpenFile(zshrcPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			progress(fmt.Sprintf("⚠️  Could not open ~/.zshrc for writing: %v", err))
+		} else {
+			defer f.Close()
+
+			// Add a comment header if this is the first time
+			markerComment := "# AI Menu CLI Tool Aliases"
+			if !bytes.Contains(existingContent, []byte(markerComment)) {
+				f.WriteString("\n" + markerComment + "\n")
+			}
+
+			// Add alias for each successfully installed tool
+			aliasesAdded := 0
+			for _, result := range results {
+				if result.Success {
+					// Map npm package names to desired alias/command names
+					aliasName := getAliasName(result.Name)
+
+					// The command name in the pixi env is the same as the alias name
+					aliasLine := fmt.Sprintf("alias %s='pixi run --manifest-path %s %s'\n",
+						aliasName, envDir, aliasName)
+
+					// Check if alias already exists
+					if !bytes.Contains(existingContent, []byte(aliasLine)) {
+						if _, err := f.WriteString(aliasLine); err == nil {
+							aliasesAdded++
+						}
+					}
+				}
+			}
+
+			if aliasesAdded > 0 {
+				progress(fmt.Sprintf("✓ Added %d alias(es) to ~/.zshrc", aliasesAdded))
+				progress("Run 'source ~/.zshrc' or restart your shell to use the aliases")
+			} else {
+				progress("Aliases already exist in ~/.zshrc")
+			}
+		}
+	}
+
 	progress(fmt.Sprintf("To use the tools, run: cd %s && pixi shell", envDir))
+	progress("Or use the aliases added to ~/.zshrc (restart shell or run: source ~/.zshrc)")
 
 	return results
 }

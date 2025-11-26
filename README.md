@@ -106,7 +106,7 @@ Select from development utilities:
 ### CLI Tools
 - **CLI tools are installed in an isolated pixi environment** at a configurable location (default: current directory + `/ai-dev-pixi`)
 - You specify a parent directory, and `ai-dev-pixi` is created inside it
-- The pixi environment includes nodejs 22.* and is cross-platform (linux-64, osx-64, osx-arm64)
+- The pixi environment includes nodejs 22.* and is cross-platform (linux-64, linux-aarch64)
 - To use the CLI tools after installation, run: `cd <parent-dir>/ai-dev-pixi && pixi shell`
 - All npm packages are installed globally within the pixi environment
 
