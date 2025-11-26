@@ -163,15 +163,24 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m.handleEnter()
 
 		case "up", "k":
-			if m.cursor > 0 {
-				m.cursor--
+			// Disable cursor navigation in installation summary view
+			if m.state != installView {
+				if m.cursor > 0 {
+					m.cursor--
+				}
 			}
 
 		case "down", "j":
-			m.cursor = m.handleDown()
+			// Disable cursor navigation in installation summary view
+			if m.state != installView {
+				m.cursor = m.handleDown()
+			}
 
 		case " ":
-			m.toggleSelection()
+			// Disable spacebar toggling in installation summary view
+			if m.state != installView {
+				m.toggleSelection()
+			}
 		}
 	}
 

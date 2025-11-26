@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -229,12 +230,12 @@ func (m model) renderPathInput() string {
 func (m model) renderInstallSummary() string {
 	var b strings.Builder
 
-	title := titleStyle.Render("📦 Installation Summary")
+	title := titleStyle.Render("📦 Selected Software for Installation")
 	b.WriteString(title)
 	b.WriteString("\n\n")
 
 	// Installation path
-	if len(m.selectedCLI) > 0 {
+	if len(m.selectedCLI) > 0 || len(m.selectedVSCode) > 0 || len(m.selectedSpecial) > 0 {
 		b.WriteString(summaryStyle.Render("Installation Path:"))
 		b.WriteString("\n")
 		fullPath := m.installPath + "/ai-dev-pixi"
@@ -246,7 +247,15 @@ func (m model) renderInstallSummary() string {
 	if len(m.selectedCLI) > 0 {
 		b.WriteString(summaryStyle.Render("CLI Tools:"))
 		b.WriteString("\n")
+		
+		// Sort tools to ensure consistent ordering
+		var tools []string
 		for tool := range m.selectedCLI {
+			tools = append(tools, tool)
+		}
+		sort.Strings(tools)
+		
+		for _, tool := range tools {
 			b.WriteString(fmt.Sprintf("  • %s\n", tool))
 		}
 		b.WriteString("\n")
@@ -256,7 +265,15 @@ func (m model) renderInstallSummary() string {
 	if len(m.selectedVSCode) > 0 {
 		b.WriteString(summaryStyle.Render("VS Code Extensions:"))
 		b.WriteString("\n")
+		
+		// Sort extensions to ensure consistent ordering
+		var extensions []string
 		for ext := range m.selectedVSCode {
+			extensions = append(extensions, ext)
+		}
+		sort.Strings(extensions)
+		
+		for _, ext := range extensions {
 			b.WriteString(fmt.Sprintf("  • %s\n", ext))
 		}
 		b.WriteString("\n")
@@ -266,7 +283,15 @@ func (m model) renderInstallSummary() string {
 	if len(m.selectedSpecial) > 0 {
 		b.WriteString(summaryStyle.Render("Special Tools:"))
 		b.WriteString("\n")
+		
+		// Sort tools to ensure consistent ordering
+		var tools []string
 		for tool := range m.selectedSpecial {
+			tools = append(tools, tool)
+		}
+		sort.Strings(tools)
+		
+		for _, tool := range tools {
 			b.WriteString(fmt.Sprintf("  • %s\n", tool))
 		}
 		b.WriteString("\n")
