@@ -7,6 +7,7 @@ func getCLITools() []string {
 		"@qodo/command - Qodo CLI",
 		"opencode-ai - OpenCode CLI",
 		"@openai/codex - OpenAI Codex CLI",
+		"droid - Droid AI coding assistant by Factory",
 	}
 }
 
@@ -23,10 +24,12 @@ func getVSCodeExtensions() []string {
 func getSpecialTools() []string {
 	return []string{
 		"helm - Kubernetes package manager",
+		"gh - GitHub CLI",
+		"ripgrep - Fast search tool (rg)",
 		"jq - JSON processor",
 		"yq - YAML processor",
 		"bat - Better cat with syntax highlighting",
-		"exa - Modern ls replacement",
+		"exa - Modern ls replacement (installs eza)",
 		"fd - Better find alternative",
 		"lazygit - Git TUI",
 	}

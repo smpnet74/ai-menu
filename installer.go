@@ -17,7 +17,7 @@ type InstallResult struct {
 
 type ProgressCallback func(message string)
 
-// getAliasName returns the desired shell alias name for a given npm package
+// getAliasName returns the desired shell alias name for a given package/tool
 func getAliasName(packageName string) string {
 	// Map specific package names to their desired aliases
 	aliasMap := map[string]string{
@@ -25,6 +25,7 @@ func getAliasName(packageName string) string {
 		"@google/gemini-cli": "gemini",
 		"@openai/codex":      "codex",
 		"opencode-ai":        "opencode",
+		"droid":              "droid",
 	}
 
 	// Check if we have a specific mapping
@@ -108,13 +109,27 @@ func InstallCLITools(tools []string, installPath string, progress ProgressCallba
 	for _, toolName := range toolNames {
 		progress(fmt.Sprintf("Installing %s...", toolName))
 
-		cmd := exec.Command("pixi", "run", "npm", "install", "-g", toolName)
-		stdout.Reset()
-		stderr.Reset()
-		cmd.Stdout = &stdout
-		cmd.Stderr = &stderr
+		var cmd *exec.Cmd
+		var err error
 
-		err := cmd.Run()
+		// Handle Droid specially - it's installed via curl script, not npm
+		if toolName == "droid" {
+			cmd = exec.Command("bash", "-c", "curl -fsSL https://app.factory.ai/cli | sh")
+			stdout.Reset()
+			stderr.Reset()
+			cmd.Stdout = &stdout
+			cmd.Stderr = &stderr
+			err = cmd.Run()
+		} else {
+			// Install npm packages via pixi
+			cmd = exec.Command("pixi", "run", "npm", "install", "-g", toolName)
+			stdout.Reset()
+			stderr.Reset()
+			cmd.Stdout = &stdout
+			cmd.Stderr = &stderr
+			err = cmd.Run()
+		}
+
 		var msg string
 		if err == nil {
 			msg = fmt.Sprintf("✓ %s installed successfully", toolName)
@@ -252,11 +267,21 @@ func InstallSpecialTools(tools []string, progress ProgressCallback) []InstallRes
 		switch toolName {
 		case "helm":
 			cmd = exec.Command("bash", "-c", "curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash")
-		case "jq", "yq", "bat", "fd":
+		case "gh":
+			// Install GitHub CLI via apt-get
+			cmd = exec.Command("sudo", "apt-get", "install", "-y", "gh")
+		case "ripgrep":
+			// Install ripgrep via apt-get
+			cmd = exec.Command("sudo", "apt-get", "install", "-y", "ripgrep")
+		case "jq", "yq", "bat":
 			// Install via apt-get
 			cmd = exec.Command("sudo", "apt-get", "install", "-y", toolName)
+		case "fd":
+			// fd is packaged as fd-find in Ubuntu
+			cmd = exec.Command("sudo", "apt-get", "install", "-y", "fd-find")
 		case "exa":
-			cmd = exec.Command("sudo", "apt-get", "install", "-y", "exa")
+			// exa has been replaced by eza in Ubuntu 24.04
+			cmd = exec.Command("sudo", "apt-get", "install", "-y", "eza")
 		case "lazygit":
 			cmd = exec.Command("bash", "-c", "LAZYGIT_VERSION=$(curl -s \"https://api.github.com/repos/jesseduffield/lazygit/releases/latest\" | grep -Po '\"tag_name\": \"v\\K[^\"]*') && curl -Lo lazygit.tar.gz \"https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz\" && tar xf lazygit.tar.gz lazygit && sudo install lazygit /usr/local/bin && rm lazygit lazygit.tar.gz")
 		default:
