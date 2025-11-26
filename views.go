@@ -122,29 +122,32 @@ func (m model) renderSpecialTools() string {
 func (m model) renderPathInput() string {
 	var b strings.Builder
 
-	title := titleStyle.Render("📁 Select Installation Directory")
+	title := titleStyle.Render("📁 Enter Installation Directory")
 	b.WriteString(title)
 	b.WriteString("\n\n")
 
-	b.WriteString(normalItemStyle.Render("Navigate and select the parent directory (ai-dev-pixi will be created inside):"))
+	b.WriteString(normalItemStyle.Render("Enter the parent directory path (ai-dev-pixi will be created inside):"))
 	b.WriteString("\n\n")
 
-	// Show the filepicker
-	b.WriteString(m.filepicker.View())
+	// Show the text input
+	b.WriteString(m.pathInput.View())
 	b.WriteString("\n\n")
 
 	// Show the full path that will be created
-	currentPath := m.filepicker.CurrentDirectory
+	currentPath := m.pathInput.Value()
+	if currentPath == "" {
+		currentPath = m.installPath
+	}
 	fullPath := currentPath + "/ai-dev-pixi"
 	pathPreview := helpStyle.Render(fmt.Sprintf("Installation path: %s", fullPath))
 	b.WriteString(pathPreview)
 	b.WriteString("\n\n")
 
-	infoText := helpStyle.Render("A pixi environment with nodejs 22.* will be created at this location.\nSupports: linux-64, osx-64, osx-arm64")
+	infoText := helpStyle.Render("A pixi environment with nodejs 22.* will be created at this location.\nSupports: linux-64, linux-aarch64, osx-64, osx-arm64")
 	b.WriteString(infoText)
 	b.WriteString("\n\n")
 
-	help := helpStyle.Render("↑/↓ navigate • enter select directory • q back")
+	help := helpStyle.Render("enter confirm • esc back")
 	b.WriteString(help)
 	b.WriteString("\n")
 

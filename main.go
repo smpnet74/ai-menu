@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/charmbracelet/bubbles/filepicker"
 	"github.com/charmbracelet/bubbles/spinner"
+	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -31,7 +31,7 @@ type model struct {
 	specialTools    []string
 	selectedSpecial map[string]bool
 	cursor          int
-	filepicker      filepicker.Model
+	pathInput       textinput.Model
 	installPath     string
 	spinner         spinner.Model
 	installing      bool
@@ -46,20 +46,19 @@ type installMsg struct{ message string }
 type installCompleteMsg struct{ results []InstallResult }
 
 func initialModel() model {
-	// Default parent directory is the current working directory
-	// (ai-dev-pixi will be created inside this)
+	// Default installation directory
 	currentDir, err := os.Getwd()
 	if err != nil {
 		currentDir = "."
 	}
 
-	// Create filepicker
-	fp := filepicker.New()
-	fp.AllowedTypes = []string{} // Empty means directories only
-	fp.CurrentDirectory = currentDir
-	fp.ShowHidden = false
-	fp.DirAllowed = true
-	fp.FileAllowed = false
+	// Create text input for path
+	ti := textinput.New()
+	ti.Placeholder = "/path/to/parent/directory"
+	ti.Focus()
+	ti.CharLimit = 256
+	ti.Width = 50
+	ti.SetValue(currentDir)
 
 	s := spinner.New()
 	s.Spinner = spinner.Dot
@@ -74,7 +73,7 @@ func initialModel() model {
 		specialTools:    getSpecialTools(),
 		selectedSpecial: make(map[string]bool),
 		cursor:          0,
-		filepicker:      fp,
+		pathInput:       ti,
 		installPath:     currentDir,
 		spinner:         s,
 		installMessages: []string{},
@@ -83,7 +82,7 @@ func initialModel() model {
 }
 
 func (m model) Init() tea.Cmd {
-	return m.filepicker.Init()
+	return textinput.Blink
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -122,29 +121,22 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "ctrl+c":
 				m.state = quitView
 				return m, tea.Quit
-			case "q":
+			case "esc":
 				// Go back to special tools view
 				m.state = specialToolsView
+				return m, nil
+			case "enter":
+				// Validate and accept the path
+				path := m.pathInput.Value()
+				if path != "" {
+					m.installPath = path
+					m.state = installView
+				}
 				return m, nil
 			}
 		}
 
-		m.filepicker, cmd = m.filepicker.Update(msg)
-
-		// Check if a directory was selected
-		if didSelect, path := m.filepicker.DidSelectFile(msg); didSelect {
-			m.installPath = path
-			m.state = installView
-			return m, nil
-		}
-
-		// Check if a directory was disabled (means it was selected as current dir)
-		if didDisable, path := m.filepicker.DidSelectDisabledFile(msg); didDisable {
-			m.installPath = path
-			m.state = installView
-			return m, nil
-		}
-
+		m.pathInput, cmd = m.pathInput.Update(msg)
 		return m, cmd
 	}
 

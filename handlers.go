@@ -16,6 +16,7 @@ func (m model) handleEnter() (tea.Model, tea.Cmd) {
 		// Go to path input if CLI tools are selected
 		if len(m.selectedCLI) > 0 {
 			m.state = pathInputView
+			m.pathInput.Focus()
 		} else {
 			m.state = installView
 		}
