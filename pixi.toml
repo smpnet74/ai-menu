@@ -2,7 +2,7 @@
 authors = ["Scott Peterson <sm_peterson@yahoo.com>"]
 channels = ["conda-forge"]
 name = "ai-menu"
-platforms = ["linux-64"]
+platforms = ["linux-64", "linux-aarch64"]
 version = "0.1.0"
 
 [tasks]
