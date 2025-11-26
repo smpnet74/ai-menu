@@ -1,0 +1,16 @@
+[workspace]
+authors = ["Scott Peterson <sm_peterson@yahoo.com>"]
+channels = ["conda-forge"]
+name = "ai-menu"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[tasks]
+build = "go build -o ai-menu ."
+run = "go run ."
+install-deps = "go mod download"
+
+[dependencies]
+go = ">=1.21"
+c-compiler = "*"
+cxx-compiler = "*"

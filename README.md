@@ -1,0 +1,143 @@
+# AI Menu - Interactive CLI Tool Installer
+
+A beautiful, interactive CLI tool for selecting and installing AI development tools, VS Code extensions, and special utilities.
+
+## Features
+
+- **Four-step workflow:**
+  1. Select CLI tools (Gemini CLI, Qodo CLI, OpenCode CLI, OpenAI Codex CLI)
+  2. Select VS Code extensions (Kilo Code, Zencoder, Augment Code)
+  3. Select special tools (helm, jq, bat, exa, lazygit, etc.)
+  4. Configure installation path (if CLI tools selected)
+
+- **Configurable installation path** - Choose where CLI tools are installed (default: current directory/ai-dev-pixi)
+- **Isolated pixi environment** - CLI tools are installed in a dedicated pixi environment with nodejs 22.*
+- **Cross-platform support** - Pixi environment configured for linux-64, osx-64, and osx-arm64
+
+- **Interactive TUI** built with Bubble Tea framework
+- **Beautiful styling** using Lipgloss
+- **Keyboard navigation** - Vi-style (hjkl) or arrow keys
+- **Multi-select** - Use spacebar to toggle selections
+- **Installation summary** before proceeding
+
+## Prerequisites
+
+- Pixi package manager
+- Go 1.21+ (managed by pixi)
+
+## Installation
+
+The project is already set up with pixi. Simply navigate to the directory:
+
+```bash
+cd /workspaces/devcontainer/ai-menu
+```
+
+## Usage
+
+### Run with pixi
+
+```bash
+pixi run run
+```
+
+### Build the binary
+
+```bash
+pixi run build
+```
+
+Then run directly:
+
+```bash
+./ai-menu
+```
+
+### Run without pixi shell
+
+You can run the program directly using pixi without entering a shell:
+
+```bash
+pixi run -- ./ai-menu
+```
+
+## Keyboard Controls
+
+- **↑/k** - Move cursor up
+- **↓/j** - Move cursor down
+- **Space** - Toggle selection
+- **Enter** - Move to next workflow
+- **q / Ctrl+C** - Quit
+
+## Workflows
+
+### 1. CLI Tools Selection
+Select from popular AI CLI tools (installed in isolated pixi environment):
+- **@google/gemini-cli** - Google Gemini CLI
+- **@qodo/command** - Qodo CLI
+- **opencode-ai** - OpenCode CLI
+- **@openai/codex** - OpenAI Codex CLI
+
+These tools will be installed in a configurable directory (default: current directory + `/ai-dev-pixi`) with nodejs 22.* in a pixi environment that supports linux-64, osx-64, and osx-arm64 platforms.
+
+### 2. Installation Path Configuration
+If CLI tools are selected, you'll be prompted to select the parent directory:
+- A file picker lets you browse and navigate directories
+- Default starting directory: Current working directory (where you ran `ai-menu`)
+- Use arrow keys to navigate, Enter to select a directory
+- The `ai-dev-pixi` directory will be created inside your chosen parent directory
+- For example, if you select `/workspaces/devcontainer`, the installation will be at `/workspaces/devcontainer/ai-dev-pixi`
+
+### 3. VS Code Extensions
+Select from AI-powered VS Code extensions:
+- **Kilo Code** - AI coding assistant
+- **Zencoder** - AI pair programmer
+- **Augment Code** - AI code completion
+
+### 4. Special Tools
+Select from development utilities:
+- Container tools (helm)
+- CLI utilities (jq, yq, bat, exa, fd)
+- Git tools (lazygit)
+
+## Installation Notes
+
+### CLI Tools
+- **CLI tools are installed in an isolated pixi environment** at a configurable location (default: current directory + `/ai-dev-pixi`)
+- You specify a parent directory, and `ai-dev-pixi` is created inside it
+- The pixi environment includes nodejs 22.* and is cross-platform (linux-64, osx-64, osx-arm64)
+- To use the CLI tools after installation, run: `cd <parent-dir>/ai-dev-pixi && pixi shell`
+- All npm packages are installed globally within the pixi environment
+
+### VS Code Extensions
+- VS Code extensions require the `code` CLI to be available in your PATH
+- Extensions are installed globally in VS Code
+
+### Special Tools
+- All tools can be installed automatically
+- Some tools may require `sudo` permissions
+
+## Project Structure
+
+```
+ai-menu/
+├── main.go         # Entry point and main model
+├── data.go         # Tool/extension data sources
+├── views.go        # UI rendering logic
+├── styles.go       # Lipgloss styling
+├── handlers.go     # Event handlers and navigation
+├── installer.go    # Installation logic
+├── pixi.toml       # Pixi configuration
+└── README.md       # This file
+```
+
+## Built With
+
+- [Bubble Tea](https://github.com/charmbracelet/bubbletea) - TUI framework
+- [Bubbles](https://github.com/charmbracelet/bubbles) - TUI components
+- [Lipgloss](https://github.com/charmbracelet/lipgloss) - Styling library
+- [Pixi](https://pixi.sh) - Package manager
+
+## License
+
+MIT
