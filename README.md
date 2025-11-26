@@ -27,10 +27,11 @@ A beautiful, interactive CLI tool for selecting and installing AI development to
 
 ## Installation
 
-The project is already set up with pixi. Simply navigate to the directory:
+Clone the repository and navigate to the directory:
 
 ```bash
-cd /workspaces/devcontainer/ai-menu
+git clone https://github.com/smpnet74/ai-menu.git
+cd ai-menu
 ```
 
 ## Usage
