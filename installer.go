@@ -17,6 +17,104 @@ type InstallResult struct {
 
 type ProgressCallback func(message string)
 
+// EnsureCoreDependencies ensures Node 22.*, Python 3.12.*, and uv are in the pixi environment
+// It only adds them if they don't already exist, preventing reinstalls
+func EnsureCoreDependencies(installPath string, progress ProgressCallback) bool {
+	progress("Ensuring core dependencies (Node 22.*, Python 3.12.*, and uv) are available...")
+
+	// Append ai-dev-pixi to the provided parent path
+	envDir := installPath + "/ai-dev-pixi"
+
+	// Create directory if it doesn't exist
+	if err := os.MkdirAll(envDir, 0755); err != nil {
+		msg := fmt.Sprintf("✗ Failed to create directory %s: %v", envDir, err)
+		progress(msg)
+		return false
+	}
+
+	// Change to the environment directory
+	if err := os.Chdir(envDir); err != nil {
+		msg := fmt.Sprintf("✗ Failed to change to directory %s: %v", envDir, err)
+		progress(msg)
+		return false
+	}
+
+	progress(fmt.Sprintf("Environment directory: %s", envDir))
+
+	// Initialize pixi project if it doesn't exist
+	progress("Initializing pixi project...")
+	cmd := exec.Command("pixi", "init", "--platform", "linux-64", "--platform", "linux-aarch64")
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	if err := cmd.Run(); err != nil {
+		progress(fmt.Sprintf("⚠️  Pixi init failed, project may already exist: %v", err))
+	}
+
+	// Check if nodejs already exists in the pixi.toml
+	pixiContent, err := os.ReadFile("pixi.toml")
+	hasNodejs := err == nil && bytes.Contains(pixiContent, []byte("nodejs"))
+	hasPython := err == nil && bytes.Contains(pixiContent, []byte("python"))
+	hasUv := err == nil && bytes.Contains(pixiContent, []byte("uv"))
+
+	// Add nodejs dependency if not already present
+	if !hasNodejs {
+		progress("Adding nodejs 22.* to pixi environment...")
+		cmd = exec.Command("pixi", "add", "nodejs=22.*")
+		stdout.Reset()
+		stderr.Reset()
+		cmd.Stdout = &stdout
+		cmd.Stderr = &stderr
+		if err := cmd.Run(); err != nil {
+			msg := fmt.Sprintf("✗ Failed to add nodejs: %v", err)
+			progress(msg)
+			return false
+		}
+		progress("✓ nodejs 22.* added to pixi environment")
+	} else {
+		progress("✓ nodejs 22.* already in pixi environment, skipping")
+	}
+
+	// Add python dependency if not already present
+	if !hasPython {
+		progress("Adding python 3.12.* to pixi environment...")
+		cmd = exec.Command("pixi", "add", "python=3.12.*")
+		stdout.Reset()
+		stderr.Reset()
+		cmd.Stdout = &stdout
+		cmd.Stderr = &stderr
+		if err := cmd.Run(); err != nil {
+			msg := fmt.Sprintf("✗ Failed to add python: %v", err)
+			progress(msg)
+			return false
+		}
+		progress("✓ python 3.12.* added to pixi environment")
+	} else {
+		progress("✓ python 3.12.* already in pixi environment, skipping")
+	}
+
+	// Add uv dependency if not already present
+	if !hasUv {
+		progress("Adding uv to pixi environment...")
+		cmd = exec.Command("pixi", "add", "uv")
+		stdout.Reset()
+		stderr.Reset()
+		cmd.Stdout = &stdout
+		cmd.Stderr = &stderr
+		if err := cmd.Run(); err != nil {
+			msg := fmt.Sprintf("✗ Failed to add uv: %v", err)
+			progress(msg)
+			return false
+		}
+		progress("✓ uv added to pixi environment")
+	} else {
+		progress("✓ uv already in pixi environment, skipping")
+	}
+
+	progress("✓ Core dependencies are ready")
+	return true
+}
+
 // getAliasName returns the desired shell alias name for a given package/tool
 func getAliasName(packageName string) string {
 	// Map specific package names to their desired aliases
@@ -53,17 +151,10 @@ func InstallCLITools(tools []string, installPath string, progress ProgressCallba
 		toolNames = append(toolNames, toolName)
 	}
 
-	progress("Creating pixi environment for CLI tools...")
+	progress("Installing CLI tools...")
 
 	// Append ai-dev-pixi to the provided parent path
 	envDir := installPath + "/ai-dev-pixi"
-
-	// Create directory if it doesn't exist
-	if err := os.MkdirAll(envDir, 0755); err != nil {
-		msg := fmt.Sprintf("✗ Failed to create directory %s: %v", envDir, err)
-		progress(msg)
-		return results
-	}
 
 	// Change to the environment directory
 	if err := os.Chdir(envDir); err != nil {
@@ -72,40 +163,10 @@ func InstallCLITools(tools []string, installPath string, progress ProgressCallba
 		return results
 	}
 
-	progress(fmt.Sprintf("Environment directory: %s", envDir))
-
-	// Initialize pixi project
-	progress("Initializing pixi project...")
-	cmd := exec.Command("pixi", "init", "--platform", "linux-64", "--platform", "linux-aarch64")
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	if err := cmd.Run(); err != nil {
-		progress(fmt.Sprintf("⚠️  Pixi init failed, project may already exist: %v", err))
-	}
-
-	// Add nodejs dependency
-	progress("Adding nodejs 22.* to pixi environment...")
-	cmd = exec.Command("pixi", "add", "nodejs=22.*")
-	stdout.Reset()
-	stderr.Reset()
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	if err := cmd.Run(); err != nil {
-		msg := fmt.Sprintf("✗ Failed to add nodejs: %v", err)
-		progress(msg)
-		results = append(results, InstallResult{
-			Name:    "nodejs",
-			Success: false,
-			Error:   err,
-			Message: msg,
-		})
-		return results
-	}
-
-	progress("✓ Pixi environment created with nodejs 22.*")
+	progress(fmt.Sprintf("Using pixi environment: %s", envDir))
 
 	// Install each CLI tool using pixi run
+	var stdout, stderr bytes.Buffer
 	for _, toolName := range toolNames {
 		progress(fmt.Sprintf("Installing %s...", toolName))
 

@@ -6,6 +6,9 @@ import (
 
 func (m model) handleEnter() (tea.Model, tea.Cmd) {
 	switch m.state {
+	case welcomeView:
+		m.state = cliToolsView
+		m.cursor = 0
 	case cliToolsView:
 		m.state = vscodeExtensionsView
 		m.cursor = 0
@@ -13,13 +16,10 @@ func (m model) handleEnter() (tea.Model, tea.Cmd) {
 		m.state = specialToolsView
 		m.cursor = 0
 	case specialToolsView:
-		// Go to path input if CLI tools are selected
-		if len(m.selectedCLI) > 0 {
-			m.state = pathInputView
-			m.pathInput.Focus()
-		} else {
-			m.state = installView
-		}
+		// ALWAYS go to path input because core dependencies (Node 22 and Python 3.12)
+		// are guaranteed to be installed regardless of selections
+		m.state = pathInputView
+		m.pathInput.Focus()
 		m.cursor = 0
 	case pathInputView:
 		m.state = installView
@@ -124,6 +124,18 @@ func (m model) performInstallation() tea.Cmd {
 			}
 		}
 
+		// Collect all results
+		allResults := []InstallResult{}
+
+		// ALWAYS ensure core dependencies first (Node 22.* and Python 3.12.*)
+		progress("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+		if !EnsureCoreDependencies(m.installPath, progress) {
+			progress("✗ Failed to ensure core dependencies")
+			return installCompleteMsg{results: allResults}
+		}
+		progress("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+		progress("")
+
 		// Convert selected maps to slices
 		cliTools := make([]string, 0, len(m.selectedCLI))
 		for tool := range m.selectedCLI {
@@ -140,23 +152,29 @@ func (m model) performInstallation() tea.Cmd {
 			specialTools = append(specialTools, tool)
 		}
 
-		// Collect all results
-		allResults := []InstallResult{}
-
 		// Perform installations
 		if len(cliTools) > 0 {
+			progress("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 			results := InstallCLITools(cliTools, m.installPath, progress)
 			allResults = append(allResults, results...)
+			progress("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+			progress("")
 		}
 
 		if len(vscodeExts) > 0 {
+			progress("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 			results := InstallVSCodeExtensions(vscodeExts, progress)
 			allResults = append(allResults, results...)
+			progress("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+			progress("")
 		}
 
 		if len(specialTools) > 0 {
+			progress("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 			results := InstallSpecialTools(specialTools, progress)
 			allResults = append(allResults, results...)
+			progress("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+			progress("")
 		}
 
 		return installCompleteMsg{results: allResults}

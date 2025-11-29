@@ -6,6 +6,69 @@ import (
 	"strings"
 )
 
+func (m model) renderWelcome() string {
+	var b strings.Builder
+
+	title := titleStyle.Render("🎉 Welcome to Scott's AI World Installation Program")
+	b.WriteString(title)
+	b.WriteString("\n\n")
+
+	// Main welcome message
+	welcome := normalItemStyle.Render("Thank you for choosing Scott's AI World!")
+	b.WriteString(welcome)
+	b.WriteString("\n\n")
+
+	// Key information
+	info1 := summaryStyle.Render("Important Information:")
+	b.WriteString(info1)
+	b.WriteString("\n")
+
+	info2 := normalItemStyle.Render("Even if you do not select any optional tools to install,")
+	b.WriteString(info2)
+	b.WriteString("\n")
+
+	info3 := normalItemStyle.Render("the following will ALWAYS be installed in the ai-dev-pixi environment:")
+	b.WriteString(info3)
+	b.WriteString("\n\n")
+
+	// List of guaranteed installs
+	node := checkedStyle.Render("✓") + " " + normalItemStyle.Render("Node.js 22.*")
+	b.WriteString(node)
+	b.WriteString("\n")
+
+	python := checkedStyle.Render("✓") + " " + normalItemStyle.Render("Python 3.12.*")
+	b.WriteString(python)
+	b.WriteString("\n")
+
+	uv := checkedStyle.Render("✓") + " " + normalItemStyle.Render("uv")
+	b.WriteString(uv)
+	b.WriteString("\n\n")
+
+	// Additional info
+	additional := helpStyle.Render("These core dependencies will be installed once and reused for")
+	b.WriteString(additional)
+	b.WriteString("\n")
+
+	additional2 := helpStyle.Render("all subsequent selections, optimizing your installation time.")
+	b.WriteString(additional2)
+	b.WriteString("\n\n")
+
+	// Optional selections notice
+	optional := normalItemStyle.Render("You can then select additional CLI tools, VS Code extensions,")
+	b.WriteString(optional)
+	b.WriteString("\n")
+
+	optional2 := normalItemStyle.Render("and special tools to customize your development environment.")
+	b.WriteString(optional2)
+	b.WriteString("\n\n")
+
+	help := helpStyle.Render("Press enter to continue • q to quit")
+	b.WriteString(help)
+	b.WriteString("\n")
+
+	return b.String()
+}
+
 func (m model) renderCLITools() string {
 	var b strings.Builder
 

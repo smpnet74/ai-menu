@@ -12,7 +12,8 @@ import (
 type sessionState int
 
 const (
-	cliToolsView sessionState = iota
+	welcomeView sessionState = iota
+	cliToolsView
 	vscodeExtensionsView
 	specialToolsView
 	pathInputView
@@ -65,7 +66,7 @@ func initialModel() model {
 	s.Style = spinnerStyle
 
 	return model{
-		state:           cliToolsView,
+		state:           welcomeView,
 		cliTools:        getCLITools(),
 		selectedCLI:     make(map[string]bool),
 		vscodeExts:      getVSCodeExtensions(),
@@ -189,6 +190,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) View() string {
 	switch m.state {
+	case welcomeView:
+		return m.renderWelcome()
 	case cliToolsView:
 		return m.renderCLITools()
 	case vscodeExtensionsView:
