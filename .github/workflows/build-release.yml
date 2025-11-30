@@ -29,13 +29,13 @@ jobs:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
         run: |
-          go build -o ai-menu-${{ matrix.goos }}-${{ matrix.goarch }} .
+          go build -o aimenu-${{ matrix.goos }}-${{ matrix.goarch }} .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ai-menu-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: ai-menu-${{ matrix.goos }}-${{ matrix.goarch }}
+          name: aimenu-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: aimenu-${{ matrix.goos }}-${{ matrix.goarch }}
 
   release:
     name: Create release
@@ -50,9 +50,9 @@ jobs:
       - name: Create checksums
         run: |
           ls -la
-          ls -la ai-menu-linux-amd64/
-          ls -la ai-menu-linux-arm64/
-          for dir in ai-menu-*/; do
+          ls -la aimenu-linux-amd64/
+          ls -la aimenu-linux-arm64/
+          for dir in aimenu-*/; do
             cd "$dir"
             for file in *; do
               if [[ -f "$file" && ! "$file" =~ \.sha256$ ]]; then
@@ -69,10 +69,10 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            ./ai-menu-linux-amd64/ai-menu-linux-amd64
-            ./ai-menu-linux-amd64/ai-menu-linux-amd64.sha256
-            ./ai-menu-linux-arm64/ai-menu-linux-arm64
-            ./ai-menu-linux-arm64/ai-menu-linux-arm64.sha256
+            ./aimenu-linux-amd64/aimenu-linux-amd64
+            ./aimenu-linux-amd64/aimenu-linux-amd64.sha256
+            ./aimenu-linux-arm64/aimenu-linux-arm64
+            ./aimenu-linux-arm64/aimenu-linux-arm64.sha256
           draft: false
           prerelease: false
         env:
