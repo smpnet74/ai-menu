@@ -9,7 +9,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Configuration
-REPO="anthropics/ai-menu"
+REPO="smpnet74/ai-menu"
 INSTALL_DIR="${INSTALL_DIR:-.}"
 BINARY_NAME="ai-menu"
 
