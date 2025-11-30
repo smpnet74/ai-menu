@@ -312,6 +312,29 @@ func InstallCLITools(tools []string, installPath string, progress ProgressCallba
 			} else {
 				progress("Aliases already exist in ~/.zshrc")
 			}
+
+			// Add npx and npm aliases if any CLI tools were successfully installed
+			hasSuccess := false
+			for _, result := range results {
+				if result.Success {
+					hasSuccess = true
+					break
+				}
+			}
+			if hasSuccess {
+				npxAliasLine := fmt.Sprintf("alias npx='pixi run --manifest-path %s npx'\n", envDir)
+				if !bytes.Contains(existingContent, []byte(npxAliasLine)) {
+					if _, err := f.WriteString(npxAliasLine); err == nil {
+						progress("✓ Added npx alias to ~/.zshrc")
+					}
+				}
+				npmAliasLine := fmt.Sprintf("alias npm='pixi run --manifest-path %s npm'\n", envDir)
+				if !bytes.Contains(existingContent, []byte(npmAliasLine)) {
+					if _, err := f.WriteString(npmAliasLine); err == nil {
+						progress("✓ Added npm alias to ~/.zshrc")
+					}
+				}
+			}
 		}
 	}
 

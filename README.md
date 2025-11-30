@@ -109,6 +109,7 @@ Select from development utilities:
 - The pixi environment includes nodejs 22.* and is cross-platform (linux-64, linux-aarch64)
 - To use the CLI tools after installation, run: `cd <parent-dir>/ai-dev-pixi && pixi shell`
 - All npm packages are installed globally within the pixi environment
+- Shell aliases for the installed CLI tools, npx, and npm are automatically added to ~/.zshrc for convenient access
 
 ### VS Code Extensions
 - VS Code extensions require the `code` CLI to be available in your PATH
