@@ -11,7 +11,7 @@ NC='\033[0m' # No Color
 # Configuration
 REPO="smpnet74/ai-menu"
 INSTALL_DIR="${INSTALL_DIR:-.}"
-BINARY_NAME="ai-menu"
+BINARY_NAME="aimenu"
 
 echo -e "${GREEN}ai-menu Installer${NC}"
 echo "===================="
