@@ -129,6 +129,7 @@ func getAliasName(packageName string) string {
 		"openhands":               "openhands",
 		"@qodo/command":           "qodo",
 		"@qoder-ai/qodercli":      "qoder",
+		"claude-flow@alpha":       "claude-flow",
 	}
 
 	// Check if we have a specific mapping
@@ -154,6 +155,7 @@ func getCommandName(packageName string) string {
 		"@google/gemini-cli":      "gemini",
 		"@openai/codex":           "codex",
 		"opencode-ai":             "opencode",
+		"claude-flow@alpha":       "claude-flow",
 	}
 
 	// Check if we have a specific mapping
@@ -445,6 +447,123 @@ func InstallSpecialTools(tools []string, progress ProgressCallback) []InstallRes
 			Message: msg,
 		})
 	}
+
+	return results
+}
+
+// InstallCLIEnhancers installs the selected CLI tool enhancers in the pixi environment
+func InstallCLIEnhancers(enhancers []string, installPath string, progress ProgressCallback) []InstallResult {
+	results := make([]InstallResult, 0, len(enhancers))
+
+	if len(enhancers) == 0 {
+		return results
+	}
+
+	progress("Installing CLI tool enhancers...")
+
+	// Append ai-dev-pixi to the provided parent path
+	envDir := installPath + "/ai-dev-pixi"
+
+	// Change to the environment directory
+	if err := os.Chdir(envDir); err != nil {
+		msg := fmt.Sprintf("✗ Failed to change to directory %s: %v", envDir, err)
+		progress(msg)
+		return results
+	}
+
+	progress(fmt.Sprintf("Using pixi environment: %s", envDir))
+
+	// Install each CLI enhancer using pixi run
+	var stdout, stderr bytes.Buffer
+	for _, enhancer := range enhancers {
+		// Convert display name to package name
+		packageName := getPackageNameForCLIEnhancer(enhancer)
+		progress(fmt.Sprintf("Installing %s...", enhancer))
+
+		// Install npm packages via pixi
+		cmd := exec.Command("pixi", "run", "npm", "install", "-g", packageName)
+		stdout.Reset()
+		stderr.Reset()
+		cmd.Stdout = &stdout
+		cmd.Stderr = &stderr
+
+		err := cmd.Run()
+
+		var msg string
+		if err == nil {
+			msg = fmt.Sprintf("✓ %s installed successfully", enhancer)
+		} else {
+			msg = fmt.Sprintf("✗ Failed to install %s: %v", enhancer, err)
+		}
+		progress(msg)
+
+		results = append(results, InstallResult{
+			Name:    packageName,
+			Success: err == nil,
+			Error:   err,
+			Message: msg,
+		})
+	}
+
+	progress(fmt.Sprintf("📦 CLI enhancers installed in pixi environment at: %s", envDir))
+
+	// Add aliases to ~/.zshrc for easy access
+	homeDir, err := os.UserHomeDir()
+	if err == nil {
+		zshrcPath := homeDir + "/.zshrc"
+		progress("Adding aliases to ~/.zshrc...")
+
+		// Read existing .zshrc content
+		existingContent, err := os.ReadFile(zshrcPath)
+		if err != nil && !os.IsNotExist(err) {
+			progress(fmt.Sprintf("⚠️  Could not read ~/.zshrc: %v", err))
+		}
+
+		// Open .zshrc for appending
+		f, err := os.OpenFile(zshrcPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			progress(fmt.Sprintf("⚠️  Could not open ~/.zshrc for writing: %v", err))
+		} else {
+			defer f.Close()
+
+			// Add a comment header if this is the first time
+			markerComment := "# AI Menu CLI Tool Aliases"
+			if !bytes.Contains(existingContent, []byte(markerComment)) {
+				f.WriteString("\n" + markerComment + "\n")
+			}
+
+			// Add alias for each successfully installed enhancer
+			aliasesAdded := 0
+			for _, result := range results {
+				if result.Success {
+					// Map npm package names to desired alias/command names
+					aliasName := getAliasName(result.Name)
+					commandName := getCommandName(result.Name)
+
+					// Create alias with the correct command name
+					aliasLine := fmt.Sprintf("alias %s='pixi run --manifest-path %s %s'\n",
+						aliasName, envDir, commandName)
+
+					// Check if alias already exists
+					if !bytes.Contains(existingContent, []byte(aliasLine)) {
+						if _, err := f.WriteString(aliasLine); err == nil {
+							aliasesAdded++
+						}
+					}
+				}
+			}
+
+			if aliasesAdded > 0 {
+				progress(fmt.Sprintf("✓ Added %d alias(es) to ~/.zshrc", aliasesAdded))
+				progress("Run 'source ~/.zshrc' or restart your shell to use the aliases")
+			} else {
+				progress("Aliases already exist in ~/.zshrc")
+			}
+		}
+	}
+
+	progress(fmt.Sprintf("To use the enhancers, run: cd %s && pixi shell", envDir))
+	progress("Or use the aliases added to ~/.zshrc (restart shell or run: source ~/.zshrc)")
 
 	return results
 }

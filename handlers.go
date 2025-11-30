@@ -16,6 +16,9 @@ func (m model) handleEnter() (tea.Model, tea.Cmd) {
 		m.state = specialToolsView
 		m.cursor = 0
 	case specialToolsView:
+		m.state = cliEnhancersView
+		m.cursor = 0
+	case cliEnhancersView:
 		// ALWAYS go to path input because core dependencies (Node 22 and Python 3.12)
 		// are guaranteed to be installed regardless of selections
 		m.state = pathInputView
@@ -43,6 +46,9 @@ func (m model) handleDown() int {
 	case specialToolsView:
 		// +1 for "Select All" option at the top
 		maxLen = len(m.specialTools) + 1
+	case cliEnhancersView:
+		// +1 for "Select All" option at the top
+		maxLen = len(m.cliEnhancers) + 1
 	default:
 		return m.cursor
 	}
@@ -112,6 +118,25 @@ func (m *model) toggleSelection() {
 				delete(m.selectedSpecial, tool)
 			}
 		}
+	case cliEnhancersView:
+		if m.cursor == 0 {
+			// Toggle Select All
+			if len(m.selectedCLIEnhancers) == len(m.cliEnhancers) {
+				// All selected, deselect all
+				m.selectedCLIEnhancers = make(map[string]bool)
+			} else {
+				// Not all selected, select all
+				for _, enhancer := range m.cliEnhancers {
+					m.selectedCLIEnhancers[enhancer] = true
+				}
+			}
+		} else if m.cursor <= len(m.cliEnhancers) {
+			enhancer := m.cliEnhancers[m.cursor-1]
+			m.selectedCLIEnhancers[enhancer] = !m.selectedCLIEnhancers[enhancer]
+			if !m.selectedCLIEnhancers[enhancer] {
+				delete(m.selectedCLIEnhancers, enhancer)
+			}
+		}
 	}
 }
 
@@ -154,6 +179,11 @@ func (m model) performInstallation() tea.Cmd {
 			specialTools = append(specialTools, tool)
 		}
 
+		cliEnhancers := make([]string, 0, len(m.selectedCLIEnhancers))
+		for enhancer := range m.selectedCLIEnhancers {
+			cliEnhancers = append(cliEnhancers, enhancer)
+		}
+
 		// Perform installations
 		if len(cliTools) > 0 {
 			progress("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
@@ -174,6 +204,14 @@ func (m model) performInstallation() tea.Cmd {
 		if len(specialTools) > 0 {
 			progress("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 			results := InstallSpecialTools(specialTools, progress)
+			allResults = append(allResults, results...)
+			progress("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+			progress("")
+		}
+
+		if len(cliEnhancers) > 0 {
+			progress("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+			results := InstallCLIEnhancers(cliEnhancers, m.installPath, progress)
 			allResults = append(allResults, results...)
 			progress("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 			progress("")

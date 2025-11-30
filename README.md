@@ -4,11 +4,12 @@ A beautiful, interactive CLI tool for selecting and installing AI development to
 
 ## Features
 
-- **Four-step workflow:**
+- **Five-step workflow:**
   1. Select CLI tools (Gemini CLI, Qodo CLI, OpenCode CLI, OpenAI Codex CLI)
   2. Select VS Code extensions (Kilo Code, Zencoder, Augment Code)
   3. Select special tools (helm, jq, bat, exa, lazygit, etc.)
-  4. Configure installation path (if CLI tools selected)
+  4. Select CLI tool enhancers (Claude Flow, etc.)
+  5. Configure installation path (if CLI tools or enhancers selected)
 
 - **Configurable installation path** - Choose where CLI tools are installed (default: current directory/ai-dev-pixi)
 - **Isolated pixi environment** - CLI tools are installed in a dedicated pixi environment with nodejs 22.*
@@ -100,6 +101,10 @@ Select from development utilities:
 - Container tools (helm)
 - CLI utilities (jq, yq, bat, exa, fd)
 - Git tools (lazygit)
+
+### 5. CLI Tool Enhancers
+Select from additional tools that enhance CLI functionality:
+- **Claude Flow by ruvnet** - Advanced CLI workflow tool
 
 ## Installation Notes
 

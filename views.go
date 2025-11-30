@@ -265,7 +265,83 @@ func (m model) renderSpecialTools() string {
 	}
 
 	b.WriteString("\n")
-	help := helpStyle.Render("↑/k up • ↓/j down • space toggle • enter review • q quit")
+	help := helpStyle.Render("↑/k up • ↓/j down • space toggle • enter next • q quit")
+	b.WriteString(help)
+	b.WriteString("\n")
+
+	return b.String()
+}
+
+func (m model) renderCLIEnhancers() string {
+	var b strings.Builder
+
+	// Add top padding
+	b.WriteString("\n")
+
+	title := titleStyle.Render("🔧 Select CLI Tool Enhancers")
+	b.WriteString(title)
+	b.WriteString("\n\n")
+
+	// Add explanation
+	explanation := helpStyle.Render("These are additional tools that enhance your AI CLI vibe coding and extend functionality.")
+	b.WriteString(explanation)
+	b.WriteString("\n")
+	explanation2 := helpStyle.Render("Keep in mind you can only have one tool installed at a time as they clobber each other's functionality.")
+	b.WriteString(explanation2)
+	b.WriteString("\n")
+	explanation3 := helpStyle.Render("It may be best if you want to try a different CLI enhancer that you delete your ai-dev-pixi directory, and rebuild your devcontainer before you try a different CLI enhancer.")
+	b.WriteString(explanation3)
+	b.WriteString("\n\n")
+
+	// Add "Select All" option at the top
+	cursor := " "
+	if m.cursor == 0 {
+		cursor = ">"
+	}
+
+	allSelected := len(m.selectedCLIEnhancers) == len(m.cliEnhancers)
+	checked := "[ ]"
+	checkStyle := uncheckedStyle
+	if allSelected && len(m.cliEnhancers) > 0 {
+		checked = "[✓]"
+		checkStyle = checkedStyle
+	}
+
+	itemStyle := normalItemStyle
+	if m.cursor == 0 {
+		itemStyle = selectedItemStyle
+	}
+
+	line := fmt.Sprintf("%s %s %s", cursor, checkStyle.Render(checked), itemStyle.Render("Select All"))
+	b.WriteString(line)
+	b.WriteString("\n\n")
+
+	// Render actual enhancers
+	for i, enhancer := range m.cliEnhancers {
+		cursor := " "
+		if m.cursor == i+1 {
+			cursor = ">"
+		}
+
+		checked := "[ ]"
+		checkStyle := uncheckedStyle
+		if m.selectedCLIEnhancers[enhancer] {
+			checked = "[✓]"
+			checkStyle = checkedStyle
+		}
+
+		itemStyle := normalItemStyle
+		if m.cursor == i+1 {
+			itemStyle = selectedItemStyle
+		}
+
+		line := fmt.Sprintf("%s %s %s", cursor, checkStyle.Render(checked), itemStyle.Render(enhancer))
+		b.WriteString(line)
+		b.WriteString("\n")
+	}
+
+	b.WriteString("\n")
+	help := helpStyle.Render("↑/k up • ↓/j down • space toggle • enter next • q quit")
 	b.WriteString(help)
 	b.WriteString("\n")
 
@@ -321,7 +397,7 @@ func (m model) renderInstallSummary() string {
 	b.WriteString("\n\n")
 
 	// Installation path
-	if len(m.selectedCLI) > 0 || len(m.selectedVSCode) > 0 || len(m.selectedSpecial) > 0 {
+	if len(m.selectedCLI) > 0 || len(m.selectedVSCode) > 0 || len(m.selectedSpecial) > 0 || len(m.selectedCLIEnhancers) > 0 {
 		b.WriteString(summaryStyle.Render("Installation Path:"))
 		b.WriteString("\n")
 		fullPath := m.installPath + "/ai-dev-pixi"
@@ -369,21 +445,39 @@ func (m model) renderInstallSummary() string {
 	if len(m.selectedSpecial) > 0 {
 		b.WriteString(summaryStyle.Render("Special Tools:"))
 		b.WriteString("\n")
-		
+
 		// Sort tools to ensure consistent ordering
 		var tools []string
 		for tool := range m.selectedSpecial {
 			tools = append(tools, tool)
 		}
 		sort.Strings(tools)
-		
+
 		for _, tool := range tools {
 			b.WriteString(fmt.Sprintf("  • %s\n", tool))
 		}
 		b.WriteString("\n")
 	}
 
-	if len(m.selectedCLI) == 0 && len(m.selectedVSCode) == 0 && len(m.selectedSpecial) == 0 {
+	// CLI Enhancers
+	if len(m.selectedCLIEnhancers) > 0 {
+		b.WriteString(summaryStyle.Render("CLI Tool Enhancers:"))
+		b.WriteString("\n")
+
+		// Sort enhancers to ensure consistent ordering
+		var enhancers []string
+		for enhancer := range m.selectedCLIEnhancers {
+			enhancers = append(enhancers, enhancer)
+		}
+		sort.Strings(enhancers)
+
+		for _, enhancer := range enhancers {
+			b.WriteString(fmt.Sprintf("  • %s\n", enhancer))
+		}
+		b.WriteString("\n")
+	}
+
+	if len(m.selectedCLI) == 0 && len(m.selectedVSCode) == 0 && len(m.selectedSpecial) == 0 && len(m.selectedCLIEnhancers) == 0 {
 		b.WriteString(helpStyle.Render("No items selected for installation."))
 		b.WriteString("\n\n")
 	}

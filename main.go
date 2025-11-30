@@ -16,6 +16,7 @@ const (
 	cliToolsView
 	vscodeExtensionsView
 	specialToolsView
+	cliEnhancersView
 	pathInputView
 	installView
 	installingView
@@ -24,21 +25,23 @@ const (
 )
 
 type model struct {
-	state           sessionState
-	cliTools        []string
-	selectedCLI     map[string]bool
-	vscodeExts      []string
-	selectedVSCode  map[string]bool
-	specialTools    []string
-	selectedSpecial map[string]bool
-	cursor          int
-	pathInput       textinput.Model
-	installPath     string
-	spinner         spinner.Model
-	installing      bool
-	installMessages []string
-	installResults  []InstallResult
-	err             error
+	state                sessionState
+	cliTools             []string
+	selectedCLI          map[string]bool
+	vscodeExts           []string
+	selectedVSCode       map[string]bool
+	specialTools         []string
+	selectedSpecial      map[string]bool
+	cliEnhancers         []string
+	selectedCLIEnhancers map[string]bool
+	cursor               int
+	pathInput            textinput.Model
+	installPath          string
+	spinner              spinner.Model
+	installing           bool
+	installMessages      []string
+	installResults       []InstallResult
+	err                  error
 }
 
 // Installation messages
@@ -66,19 +69,21 @@ func initialModel() model {
 	s.Style = spinnerStyle
 
 	return model{
-		state:           welcomeView,
-		cliTools:        getCLITools(),
-		selectedCLI:     make(map[string]bool),
-		vscodeExts:      getVSCodeExtensions(),
-		selectedVSCode:  make(map[string]bool),
-		specialTools:    getSpecialTools(),
-		selectedSpecial: make(map[string]bool),
-		cursor:          0,
-		pathInput:       ti,
-		installPath:     currentDir,
-		spinner:         s,
-		installMessages: []string{},
-		installResults:  []InstallResult{},
+		state:                welcomeView,
+		cliTools:             getCLITools(),
+		selectedCLI:          make(map[string]bool),
+		vscodeExts:           getVSCodeExtensions(),
+		selectedVSCode:       make(map[string]bool),
+		specialTools:         getSpecialTools(),
+		selectedSpecial:      make(map[string]bool),
+		cliEnhancers:         getCLIEnhancers(),
+		selectedCLIEnhancers: make(map[string]bool),
+		cursor:               0,
+		pathInput:            ti,
+		installPath:          currentDir,
+		spinner:              s,
+		installMessages:      []string{},
+		installResults:       []InstallResult{},
 	}
 }
 
@@ -198,6 +203,8 @@ func (m model) View() string {
 		return m.renderVSCodeExtensions()
 	case specialToolsView:
 		return m.renderSpecialTools()
+	case cliEnhancersView:
+		return m.renderCLIEnhancers()
 	case pathInputView:
 		return m.renderPathInput()
 	case installView:

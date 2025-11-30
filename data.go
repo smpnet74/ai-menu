@@ -61,3 +61,21 @@ func getSpecialTools() []string {
 		"lazygit - Git TUI",
 	}
 }
+
+// getCLIEnhancers returns the list of CLI tool enhancers
+func getCLIEnhancers() []string {
+	return []string{
+		"Claude Flow by ruvnet - Claude CLI enhancer",
+	}
+}
+
+// getPackageNameForCLIEnhancer maps display names to package names for installation
+func getPackageNameForCLIEnhancer(displayName string) string {
+	packageMap := map[string]string{
+		"Claude Flow by ruvnet - Claude CLI enhancer": "claude-flow@alpha",
+	}
+	if pkg, exists := packageMap[displayName]; exists {
+		return pkg
+	}
+	return displayName
+}
