@@ -49,8 +49,13 @@ jobs:
 
       - name: Create checksums
         run: |
-          for file in ai-menu-*/*; do
-            sha256sum "$file" > "$file.sha256"
+          ls -la
+          for dir in ai-menu-*/; do
+            for file in "$dir"*; do
+              if [[ -f "$file" && ! "$file" =~ \.sha256$ ]]; then
+                sha256sum "$file" > "$file.sha256"
+              fi
+            done
           done
 
       - name: Create release
