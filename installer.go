@@ -119,12 +119,16 @@ func EnsureCoreDependencies(installPath string, progress ProgressCallback) bool 
 func getAliasName(packageName string) string {
 	// Map specific package names to their desired aliases
 	aliasMap := map[string]string{
-		"@qodo/command":      "qodo",
-		"@google/gemini-cli": "gemini",
-		"@openai/codex":      "codex",
-		"opencode-ai":        "opencode",
-		"droid":              "droid",
-		"kiro":               "kiro",
+		"@sourcegraph/amp@latest": "amp",
+		"@openai/codex":           "codex",
+		"droid":                   "droid",
+		"@google/gemini-cli":      "gemini",
+		"kimi-cli":                "kimi",
+		"kiro":                    "kiro",
+		"opencode-ai":             "opencode",
+		"openhands":               "openhands",
+		"@qodo/command":           "qodo",
+		"@qoder-ai/qodercli":      "qoder",
 	}
 
 	// Check if we have a specific mapping
@@ -140,8 +144,12 @@ func getAliasName(packageName string) string {
 func getCommandName(packageName string) string {
 	// Map package names to their actual command names
 	commandMap := map[string]string{
-		"droid": "droid",
-		"kiro":  "kiro-cli",
+		"droid":                   "droid",
+		"kimi-cli":                "kimi",
+		"kiro":                    "kiro-cli",
+		"openhands":               "openhands",
+		"@qoder-ai/qodercli":      "qodercli",
+		"@sourcegraph/amp@latest": "amp",
 	}
 
 	// Check if we have a specific mapping
@@ -191,7 +199,7 @@ func InstallCLITools(tools []string, installPath string, progress ProgressCallba
 		var cmd *exec.Cmd
 		var err error
 
-		// Handle special CLI tools installed via curl scripts
+		// Handle special CLI tools installed via curl scripts or custom installers
 		if toolName == "droid" {
 			cmd = exec.Command("bash", "-c", "curl -fsSL https://app.factory.ai/cli | sh")
 			stdout.Reset()
@@ -201,6 +209,20 @@ func InstallCLITools(tools []string, installPath string, progress ProgressCallba
 			err = cmd.Run()
 		} else if toolName == "kiro" {
 			cmd = exec.Command("bash", "-c", "curl -fsSL https://cli.kiro.dev/install | bash")
+			stdout.Reset()
+			stderr.Reset()
+			cmd.Stdout = &stdout
+			cmd.Stderr = &stderr
+			err = cmd.Run()
+		} else if toolName == "kimi-cli" {
+			cmd = exec.Command("pixi", "run", "uv", "tool", "install", "--python", "3.13", "kimi-cli")
+			stdout.Reset()
+			stderr.Reset()
+			cmd.Stdout = &stdout
+			cmd.Stderr = &stderr
+			err = cmd.Run()
+		} else if toolName == "openhands" {
+			cmd = exec.Command("pixi", "run", "uv", "tool", "install", "openhands")
 			stdout.Reset()
 			stderr.Reset()
 			cmd.Stdout = &stdout

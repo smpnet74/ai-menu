@@ -139,7 +139,9 @@ func (m model) performInstallation() tea.Cmd {
 		// Convert selected maps to slices
 		cliTools := make([]string, 0, len(m.selectedCLI))
 		for tool := range m.selectedCLI {
-			cliTools = append(cliTools, tool)
+			// Convert display name to package name for installation
+			packageName := getPackageNameForCLI(tool)
+			cliTools = append(cliTools, packageName)
 		}
 
 		vscodeExts := make([]string, 0, len(m.selectedVSCode))

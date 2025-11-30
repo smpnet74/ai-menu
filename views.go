@@ -212,6 +212,11 @@ func (m model) renderSpecialTools() string {
 	b.WriteString(title)
 	b.WriteString("\n\n")
 
+	// Add explanation
+	explanation := helpStyle.Render("These are tools that are commonly used in prompts to aid the AI CLI tool to do various\nthings. In some examples some of these tools are used by various MCP servers.\nAnd some are just some of Scott's favorites.")
+	b.WriteString(explanation)
+	b.WriteString("\n\n")
+
 	// Add "Select All" option at the top
 	cursor := " "
 	if m.cursor == 0 {
