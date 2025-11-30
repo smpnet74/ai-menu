@@ -32,7 +32,7 @@ jobs:
           go build -o ai-menu-${{ matrix.goos }}-${{ matrix.goarch }} .
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ai-menu-${{ matrix.goos }}-${{ matrix.goarch }}
           path: ai-menu-${{ matrix.goos }}-${{ matrix.goarch }}
@@ -45,7 +45,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Download all artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
 
       - name: Create checksums
         run: |
