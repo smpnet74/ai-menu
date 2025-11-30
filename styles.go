@@ -8,9 +8,11 @@ var (
 	titleStyle = lipgloss.NewStyle().
 			Bold(true).
 			Foreground(lipgloss.Color("#7D56F4")).
-			Padding(1, 0).
+			Padding(1, 2).
 			Border(lipgloss.DoubleBorder()).
-			BorderForeground(lipgloss.Color("#7D56F4"))
+			BorderForeground(lipgloss.Color("#7D56F4")).
+			Width(55).
+			Align(lipgloss.Center)
 
 	selectedItemStyle = lipgloss.NewStyle().
 				Foreground(lipgloss.Color("#7D56F4")).

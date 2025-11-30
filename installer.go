@@ -124,6 +124,7 @@ func getAliasName(packageName string) string {
 		"@openai/codex":      "codex",
 		"opencode-ai":        "opencode",
 		"droid":              "droid",
+		"kiro":               "kiro",
 	}
 
 	// Check if we have a specific mapping
@@ -132,6 +133,23 @@ func getAliasName(packageName string) string {
 	}
 
 	// Default: use the package name as-is (shouldn't happen with current tools)
+	return packageName
+}
+
+// getCommandName returns the actual command name in the pixi environment for a given package/tool
+func getCommandName(packageName string) string {
+	// Map package names to their actual command names
+	commandMap := map[string]string{
+		"droid": "droid",
+		"kiro":  "kiro-cli",
+	}
+
+	// Check if we have a specific mapping
+	if command, exists := commandMap[packageName]; exists {
+		return command
+	}
+
+	// Default: use the package name as the command name
 	return packageName
 }
 
@@ -173,9 +191,16 @@ func InstallCLITools(tools []string, installPath string, progress ProgressCallba
 		var cmd *exec.Cmd
 		var err error
 
-		// Handle Droid specially - it's installed via curl script, not npm
+		// Handle special CLI tools installed via curl scripts
 		if toolName == "droid" {
 			cmd = exec.Command("bash", "-c", "curl -fsSL https://app.factory.ai/cli | sh")
+			stdout.Reset()
+			stderr.Reset()
+			cmd.Stdout = &stdout
+			cmd.Stderr = &stderr
+			err = cmd.Run()
+		} else if toolName == "kiro" {
+			cmd = exec.Command("bash", "-c", "curl -fsSL https://cli.kiro.dev/install | bash")
 			stdout.Reset()
 			stderr.Reset()
 			cmd.Stdout = &stdout
@@ -240,10 +265,11 @@ func InstallCLITools(tools []string, installPath string, progress ProgressCallba
 				if result.Success {
 					// Map npm package names to desired alias/command names
 					aliasName := getAliasName(result.Name)
+					commandName := getCommandName(result.Name)
 
-					// The command name in the pixi env is the same as the alias name
+					// Create alias with the correct command name
 					aliasLine := fmt.Sprintf("alias %s='pixi run --manifest-path %s %s'\n",
-						aliasName, envDir, aliasName)
+						aliasName, envDir, commandName)
 
 					// Check if alias already exists
 					if !bytes.Contains(existingContent, []byte(aliasLine)) {

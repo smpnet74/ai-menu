@@ -9,6 +9,9 @@ import (
 func (m model) renderWelcome() string {
 	var b strings.Builder
 
+	// Add top padding
+	b.WriteString("\n\n")
+
 	title := titleStyle.Render("🎉 Welcome to Scott's AI World Installation Program")
 	b.WriteString(title)
 	b.WriteString("\n\n")
@@ -72,6 +75,9 @@ func (m model) renderWelcome() string {
 func (m model) renderCLITools() string {
 	var b strings.Builder
 
+	// Add top padding
+	b.WriteString("\n")
+
 	title := titleStyle.Render("🚀 Select CLI Tools to Install")
 	b.WriteString(title)
 	b.WriteString("\n\n")
@@ -133,6 +139,9 @@ func (m model) renderCLITools() string {
 
 func (m model) renderVSCodeExtensions() string {
 	var b strings.Builder
+
+	// Add top padding
+	b.WriteString("\n")
 
 	title := titleStyle.Render("🔌 Select VS Code Extensions to Install")
 	b.WriteString(title)
@@ -196,7 +205,10 @@ func (m model) renderVSCodeExtensions() string {
 func (m model) renderSpecialTools() string {
 	var b strings.Builder
 
-	title := titleStyle.Render("🛠️  Select Special Tools to Install")
+	// Add top padding
+	b.WriteString("\n")
+
+	title := titleStyle.Render("🔧 Select Special Tools to Install")
 	b.WriteString(title)
 	b.WriteString("\n\n")
 
@@ -258,6 +270,9 @@ func (m model) renderSpecialTools() string {
 func (m model) renderPathInput() string {
 	var b strings.Builder
 
+	// Add top padding
+	b.WriteString("\n")
+
 	title := titleStyle.Render("📁 Enter Installation Directory")
 	b.WriteString(title)
 	b.WriteString("\n\n")
@@ -292,6 +307,9 @@ func (m model) renderPathInput() string {
 
 func (m model) renderInstallSummary() string {
 	var b strings.Builder
+
+	// Add top padding
+	b.WriteString("\n")
 
 	title := titleStyle.Render("📦 Selected Software for Installation")
 	b.WriteString(title)
@@ -375,6 +393,9 @@ func (m model) renderInstallSummary() string {
 func (m model) renderInstalling() string {
 	var b strings.Builder
 
+	// Add top padding
+	b.WriteString("\n")
+
 	title := titleStyle.Render("⏳ Installing...")
 	b.WriteString(title)
 	b.WriteString("\n\n")
@@ -403,6 +424,9 @@ func (m model) renderInstalling() string {
 
 func (m model) renderDone() string {
 	var b strings.Builder
+
+	// Add top padding
+	b.WriteString("\n")
 
 	title := titleStyle.Render("✅ Installation Complete!")
 	b.WriteString(title)

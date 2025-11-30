@@ -8,6 +8,7 @@ func getCLITools() []string {
 		"opencode-ai - OpenCode CLI",
 		"@openai/codex - OpenAI Codex CLI",
 		"droid - Droid AI coding assistant by Factory",
+		"kiro - Kiro CLI",
 	}
 }
 
