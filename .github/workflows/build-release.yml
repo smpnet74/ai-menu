@@ -50,13 +50,20 @@ jobs:
       - name: Create checksums
         run: |
           ls -la
+          ls -la ai-menu-linux-amd64/
+          ls -la ai-menu-linux-arm64/
           for dir in ai-menu-*/; do
-            for file in "$dir"*; do
+            cd "$dir"
+            for file in *; do
               if [[ -f "$file" && ! "$file" =~ \.sha256$ ]]; then
+                echo "Creating checksum for $file"
                 sha256sum "$file" > "$file.sha256"
+                ls -la "$file.sha256"
               fi
             done
+            cd ..
           done
+          find . -name "*.sha256" -type f
 
       - name: Create release
         uses: softprops/action-gh-release@v1
