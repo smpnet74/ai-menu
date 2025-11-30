@@ -76,6 +76,12 @@ download_binary() {
         exit 1
     fi
 
+    if [ ! -f "$temp_file" ] || [ ! -s "$temp_file" ]; then
+        echo -e "${RED}Error: Binary file not downloaded or is empty${NC}"
+        echo -e "${RED}URL: $download_url${NC}"
+        exit 1
+    fi
+
     chmod +x "$temp_file"
     echo "$temp_file"
 }
