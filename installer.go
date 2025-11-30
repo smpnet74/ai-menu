@@ -148,8 +148,12 @@ func getCommandName(packageName string) string {
 		"kimi-cli":                "kimi",
 		"kiro":                    "kiro-cli",
 		"openhands":               "openhands",
+		"@qodo/command":           "qodo",
 		"@qoder-ai/qodercli":      "qodercli",
 		"@sourcegraph/amp@latest": "amp",
+		"@google/gemini-cli":      "gemini",
+		"@openai/codex":           "codex",
+		"opencode-ai":             "opencode",
 	}
 
 	// Check if we have a specific mapping
