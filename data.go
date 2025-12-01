@@ -4,9 +4,12 @@ package main
 func getCLITools() []string {
 	return []string{
 		"Amp by Sourcegraph",
+		"Auggie by Augment Code",
 		"Codex by OpenAI",
 		"Droid by Factory AI",
+		"Forgecode",
 		"Gemini CLI by Google",
+		"Goose",
 		"Kimi by MoonshotAI",
 		"Kiro CLI by AWS",
 		"OpenCode CLI",
@@ -20,17 +23,20 @@ func getCLITools() []string {
 // getPackageNameForCLI maps display names to package names for installation
 func getPackageNameForCLI(displayName string) string {
 	packageMap := map[string]string{
-		"Amp by Sourcegraph":   "@sourcegraph/amp@latest",
-		"Codex by OpenAI":      "@openai/codex",
-		"Droid by Factory AI":  "droid",
-		"Gemini CLI by Google": "@google/gemini-cli",
-		"Kimi by MoonshotAI":   "kimi-cli",
-		"Kiro CLI by AWS":      "kiro",
-		"OpenCode CLI":         "opencode-ai",
-		"OpenHands":            "openhands",
-		"Plandex":              "plandex",
-		"Qodo CLI":             "@qodo/command",
-		"Qoder by Qwen":        "@qoder-ai/qodercli",
+		"Amp by Sourcegraph":      "@sourcegraph/amp@latest",
+		"Auggie by Augment Code":  "@augmentcode/auggie",
+		"Codex by OpenAI":         "@openai/codex",
+		"Droid by Factory AI":     "droid",
+		"Forgecode":               "forgecode@latest",
+		"Gemini CLI by Google":    "@google/gemini-cli",
+		"Goose":                   "goose",
+		"Kimi by MoonshotAI":      "kimi-cli",
+		"Kiro CLI by AWS":         "kiro",
+		"OpenCode CLI":            "opencode-ai",
+		"OpenHands":               "openhands",
+		"Plandex":                 "plandex",
+		"Qodo CLI":                "@qodo/command",
+		"Qoder by Qwen":           "@qoder-ai/qodercli",
 	}
 	if pkg, exists := packageMap[displayName]; exists {
 		return pkg

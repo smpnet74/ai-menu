@@ -120,9 +120,12 @@ func getAliasName(packageName string) string {
 	// Map specific package names to their desired aliases
 	aliasMap := map[string]string{
 		"@sourcegraph/amp@latest": "amp",
+		"@augmentcode/auggie":     "auggie",
 		"@openai/codex":           "codex",
 		"droid":                   "droid",
+		"forgecode@latest":        "forge",
 		"@google/gemini-cli":      "gemini",
+		"goose":                   "goose",
 		"kimi-cli":                "kimi",
 		"kiro":                    "kiro",
 		"opencode-ai":             "opencode",
@@ -146,7 +149,10 @@ func getAliasName(packageName string) string {
 func getCommandName(packageName string) string {
 	// Map package names to their actual command names
 	commandMap := map[string]string{
+		"@augmentcode/auggie":     "auggie",
 		"droid":                   "droid",
+		"forgecode@latest":        "forge",
+		"goose":                   "goose",
 		"kimi-cli":                "kimi",
 		"kiro":                    "kiro-cli",
 		"openhands":               "openhands",
@@ -210,6 +216,13 @@ func InstallCLITools(tools []string, installPath string, progress ProgressCallba
 		// Handle special CLI tools installed via curl scripts or custom installers
 		if toolName == "droid" {
 			cmd = exec.Command("bash", "-c", "curl -fsSL https://app.factory.ai/cli | sh")
+			stdout.Reset()
+			stderr.Reset()
+			cmd.Stdout = &stdout
+			cmd.Stderr = &stderr
+			err = cmd.Run()
+		} else if toolName == "goose" {
+			cmd = exec.Command("bash", "-c", "curl -fsSL https://github.com/block/goose/releases/download/stable/download_cli.sh | CONFIGURE=false bash")
 			stdout.Reset()
 			stderr.Reset()
 			cmd.Stdout = &stdout
