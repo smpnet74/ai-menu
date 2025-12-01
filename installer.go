@@ -127,6 +127,7 @@ func getAliasName(packageName string) string {
 		"kiro":                    "kiro",
 		"opencode-ai":             "opencode",
 		"openhands":               "openhands",
+		"plandex":                 "plandex",
 		"@qodo/command":           "qodo",
 		"@qoder-ai/qodercli":      "qoder",
 		"claude-flow@alpha":       "claude-flow",
@@ -149,6 +150,7 @@ func getCommandName(packageName string) string {
 		"kimi-cli":                "kimi",
 		"kiro":                    "kiro-cli",
 		"openhands":               "openhands",
+		"plandex":                 "plandex",
 		"@qodo/command":           "qodo",
 		"@qoder-ai/qodercli":      "qodercli",
 		"@sourcegraph/amp@latest": "amp",
@@ -229,6 +231,13 @@ func InstallCLITools(tools []string, installPath string, progress ProgressCallba
 			err = cmd.Run()
 		} else if toolName == "openhands" {
 			cmd = exec.Command("pixi", "run", "uv", "tool", "install", "openhands")
+			stdout.Reset()
+			stderr.Reset()
+			cmd.Stdout = &stdout
+			cmd.Stderr = &stderr
+			err = cmd.Run()
+		} else if toolName == "plandex" {
+			cmd = exec.Command("bash", "-c", "curl -sL https://plandex.ai/install.sh | bash")
 			stdout.Reset()
 			stderr.Reset()
 			cmd.Stdout = &stdout

@@ -5,7 +5,7 @@ A beautiful, interactive CLI tool for selecting and installing AI development to
 ## Features
 
 - **Five-step workflow:**
-  1. Select CLI tools (Gemini CLI, Qodo CLI, OpenCode CLI, OpenAI Codex CLI)
+  1. Select CLI tools (Amp, Codex, Droid, Gemini CLI, Kimi, Kiro, OpenCode, OpenHands, Plandex, Qodo, Qoder)
   2. Select VS Code extensions (Kilo Code, Zencoder, Augment Code)
   3. Select special tools (helm, jq, bat, exa, lazygit, etc.)
   4. Select CLI tool enhancers (Claude Flow, etc.)
@@ -75,10 +75,17 @@ pixi run -- ./ai-menu
 
 ### 1. CLI Tools Selection
 Select from popular AI CLI tools (installed in isolated pixi environment):
-- **@google/gemini-cli** - Google Gemini CLI
-- **@qodo/command** - Qodo CLI
-- **opencode-ai** - OpenCode CLI
+- **@sourcegraph/amp@latest** - Amp by Sourcegraph
 - **@openai/codex** - OpenAI Codex CLI
+- **droid** - Droid by Factory AI
+- **@google/gemini-cli** - Google Gemini CLI
+- **kimi-cli** - Kimi by MoonshotAI
+- **kiro** - Kiro CLI by AWS
+- **opencode-ai** - OpenCode CLI
+- **openhands** - OpenHands
+- **plandex** - Plandex
+- **@qodo/command** - Qodo CLI
+- **@qoder-ai/qodercli** - Qoder by Qwen
 
 These tools will be installed in a configurable directory (default: current directory + `/ai-dev-pixi`) with nodejs 22.* in a pixi environment that supports linux-64, osx-64, and osx-arm64 platforms.
 
@@ -123,6 +130,39 @@ Select from additional tools that enhance CLI functionality:
 ### Special Tools
 - All tools can be installed automatically
 - Some tools may require `sudo` permissions
+
+## Tagging and Pushing Releases
+
+To create and push a new release of the ai-menu project:
+
+1. **Update version in code** (if applicable):
+   ```bash
+   # Update any version constants in the code if needed
+   ```
+
+2. **Commit your changes**:
+   ```bash
+   git add .
+   git commit -m "Release vX.Y.Z: Brief description of changes"
+   ```
+
+3. **Create a git tag**:
+   ```bash
+   git tag -a vX.Y.Z -m "Release vX.Y.Z"
+   ```
+
+4. **Push the tag to GitHub**:
+   ```bash
+   git push origin vX.Y.Z
+   ```
+
+5. **Create a GitHub release** (optional):
+   - Go to the repository on GitHub
+   - Navigate to "Releases"
+   - Click "Create a new release"
+   - Select the tag you just pushed
+   - Add release notes describing the changes
+   - Publish the release
 
 ## Project Structure
 

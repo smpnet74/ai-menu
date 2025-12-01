@@ -11,6 +11,7 @@ func getCLITools() []string {
 		"Kiro CLI by AWS",
 		"OpenCode CLI",
 		"OpenHands",
+		"Plandex",
 		"Qodo CLI",
 		"Qoder by Qwen",
 	}
@@ -27,6 +28,7 @@ func getPackageNameForCLI(displayName string) string {
 		"Kiro CLI by AWS":      "kiro",
 		"OpenCode CLI":         "opencode-ai",
 		"OpenHands":            "openhands",
+		"Plandex":              "plandex",
 		"Qodo CLI":             "@qodo/command",
 		"Qoder by Qwen":        "@qoder-ai/qodercli",
 	}
