@@ -112,7 +112,7 @@ Select from development utilities:
 
 ### 5. CLI Tool Enhancers
 Select from additional tools that enhance CLI functionality:
-- **Claude Flow by ruvnet** - Advanced CLI workflow tool
+- **Claude Flow by ruvnet** - Advanced CLI workflow tool for orchestrating AI-powered workflows
 
 ## Installation Notes
 
@@ -131,6 +131,14 @@ Select from additional tools that enhance CLI functionality:
 ### Special Tools
 - All tools can be installed automatically
 - Some tools may require `sudo` permissions
+
+### CLI Tool Enhancers
+- **Claude Flow by ruvnet** - An advanced workflow orchestration tool for AI-powered CLI applications
+  - Installed in the same pixi environment as CLI tools
+  - Provides workflow automation and task orchestration capabilities
+  - Integrates with Claude AI for intelligent workflow execution
+  - Shell alias `claude-flow` is automatically added to ~/.zshrc for convenient access
+  - For more information, visit: https://github.com/ruvnet/claude-flow
 
 ## Tagging and Pushing Releases
 
