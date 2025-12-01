@@ -415,8 +415,8 @@ func InstallSpecialTools(tools []string, progress ProgressCallback) []InstallRes
 		case "helm":
 			cmd = exec.Command("bash", "-c", "curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash")
 		case "gh":
-			// Install GitHub CLI via apt-get
-			cmd = exec.Command("sudo", "apt-get", "install", "-y", "gh")
+			// Install GitHub CLI using official install script
+			cmd = exec.Command("bash", "-c", "curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg && echo \"deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main\" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null && sudo apt update && sudo apt install -y gh")
 		case "ripgrep":
 			// Install ripgrep via apt-get
 			cmd = exec.Command("sudo", "apt-get", "install", "-y", "ripgrep")
@@ -449,15 +449,70 @@ func InstallSpecialTools(tools []string, progress ProgressCallback) []InstallRes
 		}
 		progress(msg)
 
-		results = append(results, InstallResult{
+		result := InstallResult{
 			Name:    toolName,
 			Success: err == nil,
 			Error:   err,
 			Message: msg,
-		})
+		}
+		
+		results = append(results, result)
+		
+		// Add alias for bat to .zshrc if installation was successful
+		if toolName == "bat" && result.Success {
+			addBatAlias(progress)
+		}
 	}
 
 	return results
+}
+
+// addBatAlias adds an alias for bat pointing to batcat in .zshrc
+func addBatAlias(progress ProgressCallback) {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		progress(fmt.Sprintf("⚠️  Could not get home directory: %v", err))
+		return
+	}
+
+	zshrcPath := homeDir + "/.zshrc"
+	
+	// Read existing .zshrc content
+	existingContent, err := os.ReadFile(zshrcPath)
+	if err != nil && !os.IsNotExist(err) {
+		progress(fmt.Sprintf("⚠️  Could not read ~/.zshrc: %v", err))
+		return
+	}
+
+	// Check if alias already exists
+	batAliasLine := "alias bat='batcat'\n"
+	if bytes.Contains(existingContent, []byte(batAliasLine)) {
+		progress("✓ bat alias already exists in ~/.zshrc")
+		return
+	}
+
+	// Open .zshrc for appending
+	f, err := os.OpenFile(zshrcPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		progress(fmt.Sprintf("⚠️  Could not open ~/.zshrc for writing: %v", err))
+		return
+	}
+	defer f.Close()
+
+	// Add a comment header if this is the first time
+	specialToolsMarker := "# AI Menu Special Tools Aliases"
+	if !bytes.Contains(existingContent, []byte(specialToolsMarker)) {
+		f.WriteString("\n" + specialToolsMarker + "\n")
+	}
+
+	// Add the bat alias
+	if _, err := f.WriteString(batAliasLine); err != nil {
+		progress(fmt.Sprintf("⚠️  Could not write to ~/.zshrc: %v", err))
+		return
+	}
+
+	progress("✓ Added bat alias to ~/.zshrc")
+	progress("Run 'source ~/.zshrc' or restart your shell to use the alias")
 }
 
 // InstallCLIEnhancers installs the selected CLI tool enhancers in the pixi environment

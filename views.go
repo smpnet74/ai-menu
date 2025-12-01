@@ -130,7 +130,7 @@ func (m model) renderCLITools() string {
 	}
 
 	b.WriteString("\n")
-	help := helpStyle.Render("↑/k up • ↓/j down • space toggle • enter next • q quit")
+	help := helpStyle.Render("↑/k up • ↓/j down • space toggle • enter next • esc back • q quit")
 	b.WriteString(help)
 	b.WriteString("\n")
 
@@ -195,7 +195,7 @@ func (m model) renderVSCodeExtensions() string {
 	}
 
 	b.WriteString("\n")
-	help := helpStyle.Render("↑/k up • ↓/j down • space toggle • enter next • q quit")
+	help := helpStyle.Render("↑/k up • ↓/j down • space toggle • enter next • esc back • q quit")
 	b.WriteString(help)
 	b.WriteString("\n")
 
@@ -265,7 +265,7 @@ func (m model) renderSpecialTools() string {
 	}
 
 	b.WriteString("\n")
-	help := helpStyle.Render("↑/k up • ↓/j down • space toggle • enter next • q quit")
+	help := helpStyle.Render("↑/k up • ↓/j down • space toggle • enter next • esc back • q quit")
 	b.WriteString(help)
 	b.WriteString("\n")
 
@@ -341,7 +341,7 @@ func (m model) renderCLIEnhancers() string {
 	}
 
 	b.WriteString("\n")
-	help := helpStyle.Render("↑/k up • ↓/j down • space toggle • enter next • q quit")
+	help := helpStyle.Render("↑/k up • ↓/j down • space toggle • enter next • esc back • q quit")
 	b.WriteString(help)
 	b.WriteString("\n")
 
@@ -482,7 +482,7 @@ func (m model) renderInstallSummary() string {
 		b.WriteString("\n\n")
 	}
 
-	help := helpStyle.Render("enter to start installation • q quit without installing")
+	help := helpStyle.Render("enter to start installation • esc back • q quit without installing")
 	b.WriteString(help)
 	b.WriteString("\n")
 

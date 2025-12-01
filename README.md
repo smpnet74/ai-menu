@@ -69,6 +69,7 @@ pixi run -- ./ai-menu
 - **↓/j** - Move cursor down
 - **Space** - Toggle selection
 - **Enter** - Move to next workflow
+- **Esc** - Go back to previous screen
 - **q / Ctrl+C** - Quit
 
 ## Workflows

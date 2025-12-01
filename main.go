@@ -187,6 +187,27 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.state != installView {
 				m.toggleSelection()
 			}
+
+		case "esc":
+			// Handle back navigation
+			switch m.state {
+			case cliToolsView:
+				m.state = welcomeView
+				m.cursor = 0
+			case vscodeExtensionsView:
+				m.state = cliToolsView
+				m.cursor = 0
+			case specialToolsView:
+				m.state = vscodeExtensionsView
+				m.cursor = 0
+			case cliEnhancersView:
+				m.state = specialToolsView
+				m.cursor = 0
+			case installView:
+				m.state = pathInputView
+				m.pathInput.Focus()
+				m.cursor = 0
+			}
 		}
 	}
 
