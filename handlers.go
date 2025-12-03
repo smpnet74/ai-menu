@@ -203,7 +203,7 @@ func (m model) performInstallation() tea.Cmd {
 
 		if len(specialTools) > 0 {
 			progress("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-			results := InstallSpecialTools(specialTools, progress)
+			results := InstallSpecialTools(specialTools, m.installPath, progress)
 			allResults = append(allResults, results...)
 			progress("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 			progress("")

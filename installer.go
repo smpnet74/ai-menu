@@ -413,8 +413,17 @@ func InstallVSCodeExtensions(extensions []string, progress ProgressCallback) []I
 }
 
 // InstallSpecialTools installs the selected special tools
-func InstallSpecialTools(tools []string, progress ProgressCallback) []InstallResult {
+func InstallSpecialTools(tools []string, installPath string, progress ProgressCallback) []InstallResult {
 	results := make([]InstallResult, 0, len(tools))
+
+	// Append ai-dev-pixi to the provided parent path for pixi environment
+	envDir := installPath + "/ai-dev-pixi"
+
+	// Store current directory to restore later
+	originalDir, err := os.Getwd()
+	if err != nil {
+		progress(fmt.Sprintf("⚠️  Could not get current directory: %v", err))
+	}
 
 	for _, tool := range tools {
 		// Extract tool name from the display string
@@ -444,6 +453,14 @@ func InstallSpecialTools(tools []string, progress ProgressCallback) []InstallRes
 			cmd = exec.Command("sudo", "apt-get", "install", "-y", "eza")
 		case "lazygit":
 			cmd = exec.Command("bash", "-c", "LAZYGIT_VERSION=$(curl -s \"https://api.github.com/repos/jesseduffield/lazygit/releases/latest\" | grep -Po '\"tag_name\": \"v\\K[^\"]*') && curl -Lo lazygit.tar.gz \"https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz\" && tar xf lazygit.tar.gz lazygit && sudo install lazygit /usr/local/bin && rm lazygit lazygit.tar.gz")
+		case "modal":
+			// Install modal via uv pip in the pixi environment
+			// First change to the pixi environment directory
+			if err := os.Chdir(envDir); err != nil {
+				progress(fmt.Sprintf("✗ Failed to change to directory %s: %v", envDir, err))
+				continue
+			}
+			cmd = exec.Command("pixi", "run", "uv", "pip", "install", "modal")
 		default:
 			progress(fmt.Sprintf("⚠️  Unknown tool: %s", toolName))
 			continue
@@ -468,13 +485,23 @@ func InstallSpecialTools(tools []string, progress ProgressCallback) []InstallRes
 			Error:   err,
 			Message: msg,
 		}
-		
+
 		results = append(results, result)
-		
+
 		// Add alias for bat to .zshrc if installation was successful
 		if toolName == "bat" && result.Success {
 			addBatAlias(progress)
 		}
+
+		// Add alias for modal to .zshrc if installation was successful
+		if toolName == "modal" && result.Success {
+			addModalAlias(envDir, progress)
+		}
+	}
+
+	// Restore original directory
+	if originalDir != "" {
+		os.Chdir(originalDir)
 	}
 
 	return results
@@ -489,7 +516,7 @@ func addBatAlias(progress ProgressCallback) {
 	}
 
 	zshrcPath := homeDir + "/.zshrc"
-	
+
 	// Read existing .zshrc content
 	existingContent, err := os.ReadFile(zshrcPath)
 	if err != nil && !os.IsNotExist(err) {
@@ -525,6 +552,54 @@ func addBatAlias(progress ProgressCallback) {
 	}
 
 	progress("✓ Added bat alias to ~/.zshrc")
+	progress("Run 'source ~/.zshrc' or restart your shell to use the alias")
+}
+
+// addModalAlias adds an alias for modal pointing to the modal pip package in .zshrc
+func addModalAlias(envDir string, progress ProgressCallback) {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		progress(fmt.Sprintf("⚠️  Could not get home directory: %v", err))
+		return
+	}
+
+	zshrcPath := homeDir + "/.zshrc"
+
+	// Read existing .zshrc content
+	existingContent, err := os.ReadFile(zshrcPath)
+	if err != nil && !os.IsNotExist(err) {
+		progress(fmt.Sprintf("⚠️  Could not read ~/.zshrc: %v", err))
+		return
+	}
+
+	// Create alias using pixi environment
+	modalAliasLine := fmt.Sprintf("alias modal='pixi run --manifest-path %s/pixi.toml python -m modal'\n", envDir)
+	if bytes.Contains(existingContent, []byte(modalAliasLine)) {
+		progress("✓ modal alias already exists in ~/.zshrc")
+		return
+	}
+
+	// Open .zshrc for appending
+	f, err := os.OpenFile(zshrcPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		progress(fmt.Sprintf("⚠️  Could not open ~/.zshrc for writing: %v", err))
+		return
+	}
+	defer f.Close()
+
+	// Add a comment header if this is the first time
+	specialToolsMarker := "# AI Menu Special Tools Aliases"
+	if !bytes.Contains(existingContent, []byte(specialToolsMarker)) {
+		f.WriteString("\n" + specialToolsMarker + "\n")
+	}
+
+	// Add the modal alias
+	if _, err := f.WriteString(modalAliasLine); err != nil {
+		progress(fmt.Sprintf("⚠️  Could not write to ~/.zshrc: %v", err))
+		return
+	}
+
+	progress("✓ Added modal alias to ~/.zshrc")
 	progress("Run 'source ~/.zshrc' or restart your shell to use the alias")
 }
 

@@ -67,6 +67,7 @@ func getSpecialTools() []string {
 		"exa - Modern ls replacement (installs eza)",
 		"fd - Better find alternative",
 		"lazygit - Git TUI",
+		"modal - Serverless cloud platform CLI",
 	}
 }
 
