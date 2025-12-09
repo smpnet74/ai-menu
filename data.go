@@ -75,13 +75,15 @@ func getSpecialTools() []string {
 func getCLIEnhancers() []string {
 	return []string{
 		"Claude Flow by ruvnet - Claude CLI enhancer",
+		"Spec Kit by GitHub - GitHub specification toolkit",
 	}
 }
 
 // getPackageNameForCLIEnhancer maps display names to package names for installation
 func getPackageNameForCLIEnhancer(displayName string) string {
 	packageMap := map[string]string{
-		"Claude Flow by ruvnet - Claude CLI enhancer": "claude-flow@alpha",
+		"Claude Flow by ruvnet - Claude CLI enhancer":    "claude-flow@alpha",
+		"Spec Kit by GitHub - GitHub specification toolkit": "specify-cli",
 	}
 	if pkg, exists := packageMap[displayName]; exists {
 		return pkg

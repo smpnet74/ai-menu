@@ -134,6 +134,7 @@ func getAliasName(packageName string) string {
 		"@qodo/command":           "qodo",
 		"@qoder-ai/qodercli":      "qoder",
 		"claude-flow@alpha":       "claude-flow",
+		"specify-cli":             "spec-kit",
 	}
 
 	// Check if we have a specific mapping
@@ -164,6 +165,7 @@ func getCommandName(packageName string) string {
 		"@openai/codex":           "codex",
 		"opencode-ai":             "opencode",
 		"claude-flow@alpha":       "claude-flow",
+		"specify-cli":             "spec-kit",
 	}
 
 	// Check if we have a specific mapping
@@ -632,14 +634,23 @@ func InstallCLIEnhancers(enhancers []string, installPath string, progress Progre
 		packageName := getPackageNameForCLIEnhancer(enhancer)
 		progress(fmt.Sprintf("Installing %s...", enhancer))
 
-		// Install npm packages via pixi
-		cmd := exec.Command("pixi", "run", "npm", "install", "-g", packageName)
+		var cmd *exec.Cmd
+		var err error
+
+		// Handle special CLI enhancers installed via uv tool install
+		if packageName == "specify-cli" {
+			cmd = exec.Command("pixi", "run", "uv", "tool", "install", "--from", "git+https://github.com/github/spec-kit.git", packageName)
+		} else {
+			// Install npm packages via pixi
+			cmd = exec.Command("pixi", "run", "npm", "install", "-g", packageName)
+		}
+
 		stdout.Reset()
 		stderr.Reset()
 		cmd.Stdout = &stdout
 		cmd.Stderr = &stderr
 
-		err := cmd.Run()
+		err = cmd.Run()
 
 		var msg string
 		if err == nil {
